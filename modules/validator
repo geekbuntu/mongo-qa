@@ -6,7 +6,7 @@ errors=0;
 total=0;
 
 # find xson tests
-for xtest in `find tests -type f -name "*.xson"`; do
+for xtest in `find bson_tests -type f -name "*.xson"`; do
     for language in "$@"; do
         # xtest is something like "test/x/y/z/test.xson
 
@@ -17,7 +17,7 @@ for xtest in `find tests -type f -name "*.xson"`; do
         user_filename=${nosuffix_filename}_${run_id}.bson
 
         # call validator for the given language
-        ${language}/validate ${xtest} ${user_filename} 2>> validator.out
+        ${language}/validate $PWD/${xtest} $PWD/${user_filename} 2>> validator.out
 
         # diff the user-generated file and the test dir file
         diff -U 0 ${nosuffix_filename}.bson ${user_filename} >> validator.out
