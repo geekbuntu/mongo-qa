@@ -1,0 +1,41 @@
+#!/bin/bash
+
+errors=0;
+total=0;
+
+# find xson tests
+for xtest in `find tests -type f -name "*.xson"`; do
+    for language in "$@"; do
+        # xtest is something like "test/x/y/z/test.xson
+
+        # strip of ".xson"
+        nosuffix_filename=`echo $xtest | sed s/\.xson$//`
+
+        # user-generated output filename:
+        user_filename=${nosuffix_filename}_u.bson
+
+        # call validator for the given language
+        ${lang}/validate < ${xtest} > ${user_filename}
+
+        # diff the user-generated file and the test dir file
+        diff -U 0 ${nosuffix_filename}.bson ${user_filename} >> validator.out
+
+        # keep track of errors/total
+        if [[ $? != 0 ]]; then
+            let errors=$errors+1
+            echo -n "x"
+            echo "...for ${language}" >> validator.out
+        else
+            echo -n "."
+        fi
+        let total=$total+1
+
+        # cleanup
+#        rm ${user_filename}
+    done
+done
+
+echo ""
+echo "Total tests run:  $total"
+echo "Errors:           $errors"
+echo "Test results in \"validator.out.\""
