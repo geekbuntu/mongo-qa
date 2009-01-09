@@ -20,8 +20,12 @@ for xtest in `find bson_tests -type f -name "*.xson"`; do
         ${language}/validate $PWD/${xtest} $PWD/${user_filename} 2>> validator.out
 
         # diff the user-generated file and the test dir file
-        diff -U 0 ${nosuffix_filename}.bson ${user_filename} >> validator.out
-
+        if [ -f testfile ]; then
+            diff -U 0 ${nosuffix_filename}.bson ${user_filename} >> validator.out
+        else
+            echo "ERROR: ${language}/validate did not write to ${user_filename}" >> validator.out
+        fi
+        
         # keep track of errors/total
         if [[ $? != 0 ]]; then
             let errors=$errors+1
