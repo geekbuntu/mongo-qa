@@ -17,17 +17,19 @@ for xtest in `find bson_tests -type f -name "*.xson"`; do
         user_filename=${nosuffix_filename}_${run_id}.bson
 
         # call validator for the given language
-        ${language}/validate $PWD/${xtest} $PWD/${user_filename} 2>> validator.out
+        $language/validate ${xtest} ${user_filename} 2>> validator.out
 
+        status=1;
         # diff the user-generated file and the test dir file
         if [ -f testfile ]; then
             diff -U 0 ${nosuffix_filename}.bson ${user_filename} >> validator.out
+            status=$?
         else
-            echo "ERROR: ${language}/validate did not write to ${user_filename}" >> validator.out
+            echo "ERROR: ${language}/validate did not write to $PWD/$user_filename" >> validator.out
         fi
         
         # keep track of errors/total
-        if [[ $? != 0 ]]; then
+        if [[ $status -ne 0 ]]; then
             let errors=$errors+1
             echo -n "x"
             echo "...for ${language}" >> validator.out
