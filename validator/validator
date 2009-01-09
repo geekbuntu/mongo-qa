@@ -1,5 +1,7 @@
 #!/bin/bash
 
+run_id=`date +%b%d%y_%k%M%S`
+
 errors=0;
 total=0;
 
@@ -12,10 +14,10 @@ for xtest in `find tests -type f -name "*.xson"`; do
         nosuffix_filename=`echo $xtest | sed s/\.xson$//`
 
         # user-generated output filename:
-        user_filename=${nosuffix_filename}_u.bson
+        user_filename=${nosuffix_filename}_${run_id}.bson
 
         # call validator for the given language
-        ${language}/validate < ${xtest} > ${user_filename} 2>> validator.out
+        ${language}/validate ${xtest} ${user_filename} 2>> validator.out
 
         # diff the user-generated file and the test dir file
         diff -U 0 ${nosuffix_filename}.bson ${user_filename} >> validator.out
@@ -31,7 +33,7 @@ for xtest in `find tests -type f -name "*.xson"`; do
         let total=$total+1
 
         # cleanup
-        rm ${user_filename}
+        #rm ${user_filename}
     done
 done
 
