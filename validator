@@ -31,7 +31,7 @@ for xtest in `find tests -type f -name "*.xson"`; do
         let total=$total+1
 
         # cleanup
-#        rm ${user_filename}
+        rm ${user_filename}
     done
 done
 
