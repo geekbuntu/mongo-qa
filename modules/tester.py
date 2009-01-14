@@ -26,6 +26,8 @@ def process_output( true_out , out , report , time ):
     extra = {}
     for line2 in out:
         temp = line2.split( ":" )
+        if len( temp ) < 2:
+            continue
         extra[ temp[0].lstrip() ] = temp[1].lstrip()
 
     return extra
@@ -46,6 +48,17 @@ def report_summary( report, time, stats, exit_code ):
     report.write( "\texecuted ok: " + stats[ "ok" ] +"\n\n" )
 
 
+def report_validation( report, exit_code, temp ):
+    if exit_code == 0:
+        report.write( "\n\nPASSED VALIDATION\n" )
+    else:
+        report.write( "\n\nFAILED VALIDATION\n" )
+        temp.close();
+        temp = open( "temp", 'r' )
+        for line in temp:
+            report.write( line );
+
+
 test_dir = os.curdir + "/cmd_tests"
 tests = os.listdir( test_dir + "/src" )
 
@@ -64,7 +77,7 @@ for driver in sys.argv[1:]:
 
     for test in tests:
         t = { "id" : str( datetime.now() ) }
-        test_path = local_test_dir + "/" + test + "_" + t[ "id" ]
+        test_path = local_test_dir + "/" + test[0:-4] + "_" + t[ "id" ]
 
         # files
         out = open( test_path + ".out" , 'w' )
@@ -77,7 +90,7 @@ for driver in sys.argv[1:]:
 
         t[ "end" ] = datetime.now()
 
-        # generate report
+        # report output
         out.close();
         out = open( test_path + ".out" , 'r' )
         true_out = open( test_dir + "/src/" + test , "r" )
@@ -89,18 +102,11 @@ for driver in sys.argv[1:]:
         validate_script = test_dir + "/validate/" + test[0:-4]
         print validate_script
         exit_code = subprocess.call( [ validate_script ], 0, None, None, temp )
-        if exit_code == 0:
-            report.write( "\n\nPASSED VALIDATION\n" )
-        else:
-            report.write( "\n\nFAILED VALIDATION\n" )
-            temp.close();
-            temp = open( "temp", 'r' )
-            for line in temp:
-                report.write( line );
-
+        report_validation( report, exit_code, temp )
 
         # finish up
         temp.close()
+        os.remove( "temp" )
         report.close()
         out.close()
 
