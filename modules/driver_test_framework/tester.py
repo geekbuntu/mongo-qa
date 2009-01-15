@@ -4,7 +4,7 @@ import sys
 import subprocess
 from datetime import datetime
 
-ID = str( datetime.now().isoformat() )
+ID = datetime.now().isoformat()
 
 TEST_DIR = "/src"
 VALIDATION_DIR = "/validate"
