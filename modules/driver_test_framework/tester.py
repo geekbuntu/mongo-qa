@@ -4,12 +4,12 @@ import sys
 import subprocess
 from datetime import datetime
 
-ID = str( datetime.now() )
+ID = str( datetime.now().isoformat() )
 
 TEST_DIR = "/src"
 VALIDATION_DIR = "/validate"
 OUTPUT_DIR = "/out"
-TEMP_FILE = "/temp_" + ID
+TEMP_FILE = "temp_" + ID
 
 class Renderer :
     def __init__(self, output, p_output, report):
@@ -47,7 +47,7 @@ class Renderer :
                 self.report.write( "< " + line2 + "\n" )
                 diffcount += 1
 
-        self.report.write( "\t# incorrect output lines: " + str(diffcount) +"\n\n" )
+        self.report.write( "number of incorrect output lines: " + str(diffcount) +"\n\n" )
 
     # gather reporting info at the end of the output
     def get_stats( self ):
@@ -66,15 +66,16 @@ class Renderer :
 
     def render_stats( self, result ):
         self.report.write( "measured by tester.py: \n" )
-        self.report.write( "\tbegintime:  " + str(result[ "begin" ]) + "\n" )
-        self.report.write( "\tendtime: " + str(result[ "end" ]) + "\n" )
-        self.report.write( "\ttotaltime:     " + str(result[ "end" ] - result[ "begin" ]) + "\n\n" )
-        self.report.write( "\tok: " + str(result["exit_code"]) +"\n\n" )
+        self.report.write( "\tbegintime: " + str(result[ "begin" ]) + "\n" )
+        self.report.write( "\tendtime:   " + str(result[ "end" ]) + "\n" )
+        self.report.write( "\ttotaltime: " + str(result[ "end" ] - result[ "begin" ]) + "\n" )
+        self.report.write( "\texit_code: " + str(result["exit_code"]) +"\n\n" )
         
+        print "calling stats"
         stats = self.get_stats()
         self.report.write( "measured by driver: \n" )
-        for i in [ "begintime", "endtime", "totaltime", "ok" ]:
-            if "begintime" in stats:
+        for i in [ "begintime", "endtime", "totaltime", "exit_code" ]:
+            if i in stats:
                 self.report.write( "\t" + i + ":  " + stats[ i ] + "\n" )
             else:
                 self.report.write( "\t" + i + ":  --no " + i + " recorded--\n" )
@@ -87,6 +88,9 @@ class Renderer :
             self.report.write( "\n\nPASSED VALIDATION\n" )
         else:
             self.report.write( "\n\nFAILED VALIDATION\n" )
+            if not self.temp:
+                self.report.write( "no output\n" )
+                return
             for line in self.temp:
                 self.report.write( line )
 
