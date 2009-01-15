@@ -47,7 +47,8 @@ class Renderer :
                 self.report.write( "< " + line2 + "\n" )
                 diffcount += 1
 
-        self.report.write( "number of incorrect output lines: " + str(diffcount) +"\n\n" )
+        if diffcount > 0:
+            self.report.write( "Number of incorrect output lines: " + str(diffcount) +"\n\n" )
 
     # gather reporting info at the end of the output
     def get_stats( self ):
