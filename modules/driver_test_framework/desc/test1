@@ -1,0 +1,10 @@
+driver:
+        1. Use the database test1 at 127.0.0.1:27017
+        2. Create a collection part1 with 100 elements of the form { x : i } for i=0 to 99.
+
+validator:
+        1. Ensure the collection part1 has 100 elements
+        2. Ensure part1 contains elements { x : i } for i=0 to 99
+
+Notes:
+Running this test multiple times will make part1 contain 100 more elements each time, so the driver writer is advised to drop the collection before populating.
