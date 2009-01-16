@@ -210,8 +210,8 @@ class Framework (Summarizable):
             print "OSError: are the permissions correct for " + VALIDATION_DIR + "/" + test + "?\n"
 
         passed = self.check_results( timing_result, validation_result )
-        Summarizable.add_to_stats( self, passed )
-        #driver.add_to_stats( passed )
+        self.add_to_stats( passed )
+        driver.add_to_stats( passed )
 
         # report output
         r = Renderer( out, perfect_out, report )
