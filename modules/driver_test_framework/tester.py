@@ -108,8 +108,37 @@ class Renderer :
         if self.report:
             self.report.close()
 
+class Summarizable:
+    def __init__( self ):
+        self.passes = 0
+        self.total_tests = 0
+        self.start_time = datetime.now()
 
-class Driver:
+    def summarize( self, name ):
+        print name
+        print "Time: " + str( self.get_time() )
+        print "Total tests run: " + str( self.get_total() )
+        print "Passes: " + str( self.get_passes() )
+        print "Fails: " + str( self.get_fails() )
+        print "----------------------------"
+        if self.get_total() == 0:
+            print "Percent passed: 100%"
+        else:
+            print "Percent passed: " + str( ( self.passes / self.total_tests ) * 100 ) + "%"
+
+    def add_to_stats( self, stats ):
+        self.passes += stats
+        self.total_tests += 1
+    def get_total( self ):
+        return self.total_tests
+    def get_passes( self ):
+        return self.passes
+    def get_fails( self ):
+        return self.total_tests - self.passes
+    def get_time( self ):
+        return datetime.now() - self.start_time
+
+class Driver (Summarizable):
     def __init__( self, d ):
         try:
             temp = d.split( "=" )
@@ -117,6 +146,7 @@ class Driver:
             self.path = temp[1]
         except IndexError:
             print "improperly formatted argument: " + driver + ".  skipping..."
+        Summarizable.__init__( self )
 
     def is_valid( self ):
         return self.name != None and self.path != None
@@ -139,11 +169,11 @@ class Driver:
         driver_dir = self.get_dir( test_dir );
         return driver_dir + "/" + test + "_" + ID
 
-
-class Framework:
+class Framework (Summarizable):
     def __init__( self ):
         self.test_dir = os.curdir + TEST_DIR
         self.tests = os.listdir( self.test_dir + VALIDATION_DIR )
+        Summarizable.__init__( self )
 
     # run all tests on all drivers
     def run_all( self ):
@@ -153,6 +183,9 @@ class Framework:
                 continue
 
             self.run_all_driver( driver );
+            if len( sys.argv ) > 2:
+                driver.summarize( "Driver " + driver.get_name() )
+        self.summarize( "----------------------------\nAll tests" )
 
     # run all tests on a given driver
     def run_all_driver( self, driver ):
@@ -176,6 +209,10 @@ class Framework:
         except OSError:
             print "OSError: are the permissions correct for " + VALIDATION_DIR + "/" + test + "?\n"
 
+        passed = self.check_results( timing_result, validation_result )
+        Summarizable.add_to_stats( self, passed )
+        #driver.add_to_stats( passed )
+
         # report output
         r = Renderer( out, perfect_out, report )
         r.render_header( test, driver.get_name() )
@@ -195,6 +232,14 @@ class Framework:
         result[ "exit_code" ] = subprocess.call( [ validate_script, TEMP_FILE ] )
         return result
 
+    def check_results( self, result1, result2 ):
+        if result1 and "exit_code" in result1 and result1[ "exit_code" ] == 0:
+            if result2 and "exit_code" in result2 and result2[ "exit_code" ] == 0:
+                print "."
+                return 1
+        print "F"
+        return 0
+        
 
 f = Framework()
 f.run_all()
