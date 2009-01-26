@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<project name="stand-alone-release" default="update-build" basedir=".">
+
+    <property name="distdir" value="target/mongo-dist"/>
+    <property name="bindir" value="${distdir}/bin"/>
+    <property name="libdir" value="${distdir}/lib"/>
+    <property name="jarsdir" value="${distdir}/jars"/>
+
+    <property name="workdir" value="workdir"/>
+
+    <target name="clean">
+        <delete failonerror="false" dir="${workdir}"/>
+    </target>
+    
+    <target name="init">
+        <mkdir dir="${workdir}"/>
+    </target>
+
+    <!--   PRIMARY TARGETS -->
+
+    <target name="dist" depends="clean-build, make-dist" description="Clean build and packaging of Mongo distribution"/>
+    <target name="clean-build" depends="clean, init, setup, build" description="Create a fresh checkout and build of mongo and dbshell"/>
+    <target name="update-build" depends="update-code, build" description="After a clean-build, incrementally update code and re-build all"/>
+
+    <!--   SEOONDARY TARGETS -->
+    
+    <target name="setup" depends="mongo-shell-checkout, mongo-checkout, v8-checkout"/>
+    <target name="build" depends="mongo-shell-build, mongo-build"/>
+    <target name="update-code" depends="mongo-update, mongo-shell-update, v8-update"/>
+
+    <!-- ======================================================
+            packaging targets
+      ====================================================- -->
+
+    <target name="make-dist">
+
+        <delete failonerror="false" dir="${distdir}"/>
+        <mkdir dir="${distdir}"/>
+        <mkdir dir="${bindir}"/>
+        <mkdir dir="${libdir}"/>
+
+        <!-- mongo and libs -->
+
+        <copy file="${workdir}/mongo/db/db" todir="${bindir}"/>
+        <chmod file="${bindir}/db" perm="554"/>
+
+        <copy todir="${libdir}">
+           <fileset dir="${workdir}/mongo/lib/"/>
+        </copy>
+
+        <copy todir="${jarsdir}">
+           <fileset dir="${workdir}/mongo/jars/"/>
+        </copy>
+
+        <!-- dbshell -->
+
+        <copy file="${workdir}/mongo-shell/dbshell" todir="${bindir}"/>
+        <chmod file="${bindir}/dbshell" perm="554"/>
+
+    </target>
+
+    <!-- ======================================================
+            mongo targets
+      ====================================================- -->
+
+    <target name="mongo-build">
+        <exec dir="${workdir}/mongo" executable="scons"/>
+    </target>
+
+    <target name="mongo-clientlibrary-build" >
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="libmongoclient.a"/>
+        </exec>
+    </target>
+
+    <target name="mongo-tests-build" >
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="test"/>
+        </exec>
+    </target>
+
+    <target name="mongo-checkout">
+        <exec dir="${workdir}" executable="git">
+          <arg value="clone"/>
+          <arg value="git://github.com/mongodb/mongo.git"/>
+        </exec>
+    </target>
+
+    <target name="mongo-update">
+        <exec dir="${workdir}/mongo" executable="git">
+          <arg value="pull"/>
+        </exec>
+    </target>
+
+    <target name="mongo-run-tests" depends="mongo-tests-build" >
+        <mkdir dir="/tmp/unittest/"/>
+        <exec executable="${workdir}/mongo/test"/>
+    </target>
+
+     <!-- ======================================================
+            mongo-shell targets
+      ====================================================- -->
+
+    <target name="mongo-shell-build" depends="v8-lib-build, mongo-clientlibrary-build">
+        <exec dir="${workdir}/mongo-shell" executable="scons"/>
+    </target>
+
+    <target name="mongo-shell-checkout">
+        <exec dir="${workdir}" executable="git">
+          <arg value="clone"/>
+          <arg value="git://github.com/mongodb/mongo-shell.git"/>
+        </exec>
+    </target>
+
+    <target name="mongo-shell-update">
+        <exec dir="${workdir}/mongo-shell" executable="git">
+          <arg value="pull"/>
+        </exec>
+    </target>
+
+
+    <!-- ======================================================
+            V8 targets
+      ====================================================- -->
+
+    <target name="v8-lib-build">
+        <exec dir="${workdir}/v8" executable="scons">
+            <arg value="libv8.a"/>
+        </exec>
+    </target>
+
+    <target name="v8-checkout">
+        <exec dir="${workdir}" executable="svn">
+          <arg value="checkout"/>
+          <arg value="http://v8.googlecode.com/svn/trunk/"/>
+          <arg value="v8"/>
+        </exec>
+    </target>
+
+    <target name="v8-update">
+        <exec dir="${workdir}/v8" executable="svn">
+          <arg value="update"/>
+        </exec>
+    </target>
+
+
+    <!-- ========================================================
+           python driver and tools
+    =========================================================== -->
+
+    <!-- ========================================================
+           ruby driver and tools
+    =========================================================== -->
+
+    <!-- ========================================================
+           java driver and tools
+    =========================================================== -->
+
+</project>
