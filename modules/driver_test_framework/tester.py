@@ -7,6 +7,7 @@ from datetime import datetime
 ID = datetime.now().isoformat()
 
 TEST_DIR = "/src"
+PREP_DIR = "/pre"
 VALIDATION_DIR = "/validate"
 OUTPUT_DIR = "/out"
 TEMP_FILE = "temp_" + ID
@@ -190,6 +191,10 @@ class Framework (Summarizable):
     # run all tests on a given driver
     def run_all_driver( self, driver ):
         for test in self.tests:
+            # if there is a pre-test file to run, do so
+            prep = self.test_dir + PREP_DIR + "/" + test
+            if os.path.exists( prep ):
+                subprocess.call( [prep] )
             self.run_test( driver, test )
 
     # run a specific test on a given driver
