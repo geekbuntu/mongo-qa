@@ -1,0 +1,15 @@
+driver:
+        1. create a capped collection capped1 with size 500
+        2. add to capped1
+           { x : 1 }
+           { x : 2 }
+        3. create a capped collection capped2 with size 1000 and { $nExtents : 11 }
+        4. str = ""
+           for i = 1 to 100
+               db.capped2.save( { dashes: str } )
+               str += "-"
+
+validator:
+        1. capped1 has 2 elements
+        2. capped1.find().sort( {$natural:1} )[0].x = 1
+        3. capped1.find().sort( {$natural:-1} )[0].x = 2
