@@ -1,0 +1,15 @@
+setup:
+        1. add 50 elements to remove1
+        2. add to remove2:
+           { a : 3, b : 1 }
+           { a : 3, b : 3 } 
+           { a : 2, b : 3 }
+           { b : 3 }
+
+driver:
+        1. remove everything from the collection remove1
+        2. remove all elements where { a : 3 } from remove2
+
+validator:
+        1. check that remove1 is empty
+        2. check that remove2 has two elements: one where { a : 2 }, one without an "a" field
