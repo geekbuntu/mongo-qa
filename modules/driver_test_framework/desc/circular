@@ -1,0 +1,11 @@
+driver:
+        1. create collections a and b
+        2. save { c : b } in a
+        3. save { c : 1 } in b
+        4. x = { that : 2 }
+           x.thiz = x
+           db.c.save( x )
+
+validator:
+        1. a.findOne().c.findOne().c == 1
+        2. c.findOne().thiz.thiz.that == 2

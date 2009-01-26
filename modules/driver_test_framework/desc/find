@@ -1,0 +1,11 @@
+driver:
+        1. Create a collection called test
+        2. Add one element to it: { a : 2 }
+
+validator:
+        1. test has one element
+        2. test.find( { _id : test.find()[0]._id } ).a == 2
+        2. test.find( { _id : test.find()[0]._id, { n : 1 } } ).a == 2
+
+
+
