@@ -9,6 +9,7 @@
     <property name="bindir" value="${distdir}/bin"/>
     <property name="libdir" value="${distdir}/lib"/>
     <property name="jarsdir" value="${distdir}/jars"/>
+    <property name="toolsdir" value="${distdir}/drivers_and_tools"/>
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
@@ -40,6 +41,7 @@
         <mkdir dir="${distdir}"/>
         <mkdir dir="${bindir}"/>
         <mkdir dir="${libdir}"/>
+        <mkdir dir="${toolsdir}"/>
 
         <!-- mongo and libs -->
 
@@ -62,7 +64,24 @@
         <!-- notices and info -->
         <copy todir="${distdir}">
             <fileset dir="${srcdir}/resources"/>
-          </copy>
+        </copy>
+
+        <!-- drivers and tools - be dumb for now -->
+
+        <exec dir="${toolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
+         </exec>
+
+        <exec dir="${toolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
+         </exec>
+
+        <exec dir="${toolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
+         </exec>
 
     </target>
 
