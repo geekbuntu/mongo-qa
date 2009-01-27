@@ -26,7 +26,7 @@ class Renderer :
             self.p_output = open( p_output, 'r' )
         else:
             self.p_output = None
-                
+
         self.report = open( report, 'w' )
 
     def render_header( self, test, driver ):
@@ -62,7 +62,7 @@ class Renderer :
             if len( temp ) < 2:
                 continue
             extra[ temp[0].lstrip() ] = temp[1].lstrip()
-            
+
         return extra
 
 
@@ -72,7 +72,7 @@ class Renderer :
         self.report.write( "\tendtime:   " + str(result[ "end" ]) + "\n" )
         self.report.write( "\ttotaltime: " + str(result[ "end" ] - result[ "begin" ]) + "\n" )
         self.report.write( "\texit_code: " + str(result["exit_code"]) +"\n\n" )
-        
+
         print "calling stats"
         stats = self.get_stats()
         self.report.write( "measured by driver: \n" )
@@ -84,7 +84,7 @@ class Renderer :
 
 
     def render_validation( self, result ):
-        if not result: 
+        if not result:
             self.report.write( "\n\nERROR!  COULD NOT RUN VALIDATE!\n" )
         elif result[ "exit_code" ] == 0:
             self.report.write( "\n\nPASSED VALIDATION\n" )
@@ -203,7 +203,7 @@ class Framework (Summarizable):
         out = driver.get_unique_path( self.test_dir, test ) + ".out"
         report = driver.get_unique_path( self.test_dir, test ) + ".report"
         perfect_out = self.test_dir + OUTPUT_DIR + "/" + test + ".out"
-        
+
         # run test
         timing_result = self.run_timed_test( driver, test, out, {} );
 
@@ -227,9 +227,13 @@ class Framework (Summarizable):
         r.cleanup()
 
     def run_timed_test( self, driver, test, output, result ):
+        old_path = os.getcwd()
+        output = os.path.abspath(output)
+        os.chdir(os.path.dirname(driver.get_path()))
         result[ "begin" ] = datetime.now()
         result[ "exit_code" ] = subprocess.call( [driver.get_path(), test, output] )
         result[ "end" ] = datetime.now()
+        os.chdir(old_path)
         return result
 
     def run_validation_test( self, test, result ):
@@ -244,7 +248,7 @@ class Framework (Summarizable):
                 return 1
         print "F"
         return 0
-        
+
 
 f = Framework()
 f.run_all()
