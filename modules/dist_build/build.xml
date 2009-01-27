@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <project name="stand-alone-release" default="update-build" basedir=".">
 
+    <property name="workdir" value="workdir"/>
+
+    <property name="srcdir" value="src"/>
+
     <property name="distdir" value="target/mongo-dist"/>
     <property name="bindir" value="${distdir}/bin"/>
     <property name="libdir" value="${distdir}/lib"/>
     <property name="jarsdir" value="${distdir}/jars"/>
-
-    <property name="workdir" value="workdir"/>
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
@@ -56,6 +58,11 @@
 
         <copy file="${workdir}/mongo/dbshell" tofile="${bindir}/mongo"/>
         <chmod file="${bindir}/mongo" perm="554"/>
+
+        <!-- notices and info -->
+        <copy todir="${distdir}">
+            <fileset dir="${srcdir}/resources"/>
+          </copy>
 
     </target>
 
