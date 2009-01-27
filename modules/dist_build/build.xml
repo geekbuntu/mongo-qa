@@ -1,0 +1,258 @@
+<?xml version="1.0"?>
+<project name="stand-alone-release" default="update-build" basedir=".">
+
+    <property name="workdir" value="workdir"/>
+
+    <property name="srcdir" value="src"/>
+
+    <property name="targetdir" value="target"/>
+    <property name="distdir" value="${targetdir}/mongo-dist"/>
+    <property name="bindir" value="${distdir}/bin"/>
+    <property name="libdir" value="${distdir}/lib"/>
+    <property name="jarsdir" value="${distdir}/jars"/>
+    <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/supported"/>
+    <property name="communitytoolsdir" value="${distdir}/drivers_and_tools/community"/>
+
+    <!-- build time -->
+    <tstamp>
+      <format property="timenow" pattern="yyyyMMddHHmm" />
+    </tstamp>
+
+    <!-- this special case makes sense -->
+    <condition property="os" value="windows">
+      <os family="Windows" />
+    </condition>
+    <condition property="windows" value="true">
+        <os family="Windows" />
+    </condition>
+    <condition property="os" value="linux">
+      <os name="linux" />
+    </condition>
+    <condition property="os" value="macosx">
+      <os name="mac os x" />
+    </condition>
+    
+
+    <target name="clean">
+        <delete failonerror="false" dir="${workdir}"/>
+    </target>
+    
+    <target name="init">
+        <mkdir dir="${workdir}"/>
+    </target>
+
+    <!--   PRIMARY TARGETS -->
+
+    <target name="dist" depends="clean-build, make-dist" description="Clean build and packaging of Mongo distribution"/>
+    <target name="clean-build" depends="clean, init, setup, build" description="Create a fresh checkout and build of mongo and dbshell"/>
+    <target name="update-build" depends="update-code, build" description="After a clean-build, incrementally update code and re-build all"/>
+
+    <!--   SEOONDARY TARGETS -->
+    
+    <target name="setup" depends="mongo-checkout, v8-checkout"/>
+    <target name="build" depends="v8-lib-build, mongo-full-build"/>
+    <target name="update-code" depends="mongo-update, v8-update"/>
+
+    <!-- ======================================================
+            packaging targets
+      ====================================================- -->
+
+    <target name="make-dist" depends="dist-setup, dist-package"/>
+
+    <target name="dist-setup">
+
+        <delete failonerror="false" dir="${distdir}"/>
+        <mkdir dir="${distdir}"/>
+        <mkdir dir="${bindir}"/>
+        <mkdir dir="${libdir}"/>
+        <mkdir dir="${supportedtoolsdir}"/>
+        <mkdir dir="${communitytoolsdir}"/>
+
+
+        <!-- mongo jars, libs, headers and binaries -->
+
+        <antcall target="mongo-install"/>
+        
+        <chmod file="${bindir}/**" perm="554"/>
+
+        <!-- jars and libs
+
+        <copy todir="${libdir}">
+           <fileset dir="${workdir}/mongo/lib/"/>
+        </copy>
+
+        <copy todir="${jarsdir}">
+           <fileset dir="${workdir}/mongo/jars/"/>
+        </copy>
+
+
+        <copy file="${workdir}/mongo/db/db" tofile="${bindir}/mongod"/>
+
+        <copy file="${workdir}/mongo/dbshell" tofile="${bindir}/mongo"/>
+
+        <copy file="${workdir}/mongo/mongodump" tofile="${bindir}/mongodump"/>
+
+        <copy file="${workdir}/mongo/mongoimport" tofile="${bindir}/mongoimport"/>
+
+-->
+
+        <!-- general notices and info -->
+        <copy todir="${distdir}">
+            <fileset dir="${srcdir}/resources">
+                <exclude name="DRIVERS_AND_TOOLS_INFO"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${distdir}/drivers_and_tools/" file="${srcdir}/resources/DRIVERS_AND_TOOLS_INFO"/>
+
+        <!-- supported drivers and tools - be dumb for now -->
+
+        <exec dir="${supportedtoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
+         </exec>
+
+        <exec dir="${supportedtoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
+         </exec>
+
+        <exec dir="${supportedtoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
+         </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" executable="ant">
+           <arg value="jar"/>
+        </exec>
+
+        <!-- community drivers and tools - be dumb for now -->
+
+        <exec dir="${communitytoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/geir/mongo-java-driver.git"/>
+         </exec>
+
+        <exec dir="${communitytoolsdir}/mongo-java-driver" executable="ant"/>
+
+        <exec dir="${communitytoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/geir/mongo-message-monitor.git"/>
+         </exec>
+
+        <exec dir="${communitytoolsdir}/mongo-message-monitor" executable="ant"/>
+
+    </target>
+
+    <target name="dist-package">
+        <tar tarfile="${targetdir}/mongo-${os}-${os.arch}-${timenow}.tar.gz" longfile="gnu" compression="gzip">
+
+            <tarfileset mode="754" dir="${targetdir}">
+                <include name="mongo-dist/bin/**"/>
+            </tarfileset>
+
+            <tarfileset  dir="${targetdir}">
+                <include name="mongo-dist/**"/>
+                <exclude name="mongo-dist/bin/**"/>
+            </tarfileset>
+
+            </tar>
+    </target>
+    <!-- ======================================================
+            mongo targets
+      ====================================================- -->
+
+    <target name="mongo-full-build">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="."/>
+        </exec>
+    </target>
+
+    <target name="mongo-clientlibrary-build" >
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="libmongoclient.a"/>
+        </exec>
+    </target>
+
+    <target name="mongo-shell-build" depends="v8-lib-build">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="mongo"/>
+        </exec>
+    </target>
+
+    <target name="mongo-tools-build">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="mongodump mongoimport"/>
+        </exec>
+    </target>
+
+    <target name="mongo-tests-build" >
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="test"/>
+        </exec>
+    </target>
+
+    <target name="mongo-install">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="--prefix"/>
+            <arg value="../../${distdir}"/>
+        </exec>
+    </target>
+
+    <target name="mongo-checkout">
+        <exec dir="${workdir}" executable="git">
+          <arg value="clone"/>
+          <arg value="git://github.com/mongodb/mongo.git"/>
+        </exec>
+    </target>
+
+    <target name="mongo-update">
+        <exec dir="${workdir}/mongo" executable="git">
+          <arg value="pull"/>
+        </exec>
+    </target>
+
+    <target name="mongo-run-tests" depends="mongo-tests-build" >
+        <mkdir dir="/tmp/unittest/"/>
+        <exec executable="${workdir}/mongo/test"/>
+    </target>
+
+
+    <!-- ======================================================
+            V8 targets
+      ====================================================- -->
+
+    <target name="v8-lib-build">
+        <exec dir="${workdir}/v8" executable="scons">
+            <arg value="libv8.a"/>
+        </exec>
+    </target>
+
+    <target name="v8-checkout">
+        <exec dir="${workdir}" executable="svn">
+          <arg value="checkout"/>
+          <arg value="http://v8.googlecode.com/svn/trunk/"/>
+          <arg value="v8"/>
+        </exec>
+    </target>
+
+    <target name="v8-update">
+        <exec dir="${workdir}/v8" executable="svn">
+          <arg value="update"/>
+        </exec>
+    </target>
+
+
+    <!-- ========================================================
+           python driver and tools
+    =========================================================== -->
+
+    <!-- ========================================================
+           ruby driver and tools
+    =========================================================== -->
+
+    <!-- ========================================================
+           java driver and tools
+    =========================================================== -->
+
+</project>

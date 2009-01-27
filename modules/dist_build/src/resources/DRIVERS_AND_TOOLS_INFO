@@ -1,0 +1,13 @@
+Drivers and Tools
+==================
+
+This directory contains drivers and other tools for MongoDB.
+
+They are divided into two sets :
+
+1) Supported - these are part of the MongoDB project and will be supported
+   by the project.
+
+2) Unsupported - these are 3rd party projects that work with MongoDB and are
+   included here for you convenience.  They are not supported by the MongoDB
+   project

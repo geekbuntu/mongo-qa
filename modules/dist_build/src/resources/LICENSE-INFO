@@ -1,0 +1,26 @@
+This software and accompanying materials are licensed under the
+following licenses, copies of which are included herein :
+
+1) MongoDB client and server software :
+
+     GNU AGPL v3.0
+
+2) Supported drivers and other tools
+
+  As found in drivers_and_tools/supported
+
+     Apache License v2.0
+
+2) Community drivers and other tools
+
+  As found in drivers_and_tools/community
+
+     - per project 
+
+Note that MongoDB incorporates third-party software.  License
+and other relevant information for this third-party software can
+be found in the
+
+   THIRD-PARTY-NOTICES
+
+file included in this distribution.
