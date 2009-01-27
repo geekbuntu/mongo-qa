@@ -72,10 +72,14 @@
         <copy file="${workdir}/mongo/dbshell" tofile="${bindir}/mongo"/>
         <chmod file="${bindir}/mongo" perm="554"/>
 
-        <!-- notices and info -->
+        <!-- general notices and info -->
         <copy todir="${distdir}">
-            <fileset dir="${srcdir}/resources"/>
+            <fileset dir="${srcdir}/resources">
+                <exclude name="DRIVERS_AND_TOOLS_INFO"/>
+            </fileset>
         </copy>
+
+        <copy todir="${distdir}/drivers_and_tools/" file="${srcdir}/resources/DRIVERS_AND_TOOLS_INFO"/>
 
         <!-- supported drivers and tools - be dumb for now -->
 
