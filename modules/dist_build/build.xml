@@ -5,11 +5,19 @@
 
     <property name="srcdir" value="src"/>
 
-    <property name="distdir" value="target/mongo-dist"/>
+    <property name="targetdir" value="target"/>
+    <property name="distdir" value="${targetdir}/mongo-dist"/>
     <property name="bindir" value="${distdir}/bin"/>
     <property name="libdir" value="${distdir}/lib"/>
     <property name="jarsdir" value="${distdir}/jars"/>
-    <property name="toolsdir" value="${distdir}/drivers_and_tools"/>
+    <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/supported"/>
+    <property name="communitytoolsdir" value="${distdir}/drivers_and_tools/community"/>
+
+    <!-- build time -->
+    <tstamp>
+      <format property="timenow" pattern="yyyyMMddHHmm" />
+    </tstamp>
+
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
@@ -35,13 +43,16 @@
             packaging targets
       ====================================================- -->
 
-    <target name="make-dist">
+    <target name="make-dist" depends="dist-setup, dist-package"/>
+
+    <target name="dist-setup">
 
         <delete failonerror="false" dir="${distdir}"/>
         <mkdir dir="${distdir}"/>
         <mkdir dir="${bindir}"/>
         <mkdir dir="${libdir}"/>
-        <mkdir dir="${toolsdir}"/>
+        <mkdir dir="${supportedtoolsdir}"/>
+        <mkdir dir="${communitytoolsdir}"/>
 
         <!-- mongo and libs -->
 
@@ -66,25 +77,59 @@
             <fileset dir="${srcdir}/resources"/>
         </copy>
 
-        <!-- drivers and tools - be dumb for now -->
+        <!-- supported drivers and tools - be dumb for now -->
 
-        <exec dir="${toolsdir}" executable="git">
+        <exec dir="${supportedtoolsdir}" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
          </exec>
 
-        <exec dir="${toolsdir}" executable="git">
+        <exec dir="${supportedtoolsdir}" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
          </exec>
 
-        <exec dir="${toolsdir}" executable="git">
+        <exec dir="${supportedtoolsdir}" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
          </exec>
 
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" executable="ant">
+           <arg value="jar"/>
+        </exec>
+
+        <!-- community drivers and tools - be dumb for now -->
+
+        <exec dir="${communitytoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/geir/mongo-java-driver.git"/>
+         </exec>
+
+        <exec dir="${communitytoolsdir}/mongo-java-driver" executable="ant"/>
+
+        <exec dir="${communitytoolsdir}" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/geir/mongo-message-monitor.git"/>
+         </exec>
+
+        <exec dir="${communitytoolsdir}/mongo-message-monitor" executable="ant"/>
+
     </target>
 
+    <target name="dist-package">
+        <tar tarfile="${targetdir}/mongo-${timenow}.tar.gz" longfile="gnu" compression="gzip">
+
+            <tarfileset mode="754" dir="${targetdir}">
+                <include name="mongo-dist/bin/**"/>
+            </tarfileset>
+
+            <tarfileset  dir="${targetdir}">
+                <include name="mongo-dist/**"/>
+                <exclude name="mongo-dist/bin/**"/>
+            </tarfileset>
+
+            </tar>
+    </target>
     <!-- ======================================================
             mongo targets
       ====================================================- -->

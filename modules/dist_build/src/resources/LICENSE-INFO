@@ -5,10 +5,17 @@ following licenses, copies of which are included herein :
 
      GNU AGPL v3.0
 
-2) Drivers and other tools
+2) Supported drivers and other tools
+
+  As found in drivers_and_tools/supported
 
      Apache License v2.0
 
+2) Community drivers and other tools
+
+  As found in drivers_and_tools/community
+
+     - per project 
 
 Note that MongoDB incorporates third-party software.  License
 and other relevant information for this third-party software can
