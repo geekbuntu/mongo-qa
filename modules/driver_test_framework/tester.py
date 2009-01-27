@@ -61,7 +61,7 @@ class Renderer :
             temp = line.split( ":" )
             if len( temp ) < 2:
                 continue
-            extra[ temp[0].lstrip() ] = temp[1].lstrip()
+            extra[ temp[0].lstrip() ] = line[len(temp[0]) + 1:].strip()
 
         return extra
 
@@ -77,10 +77,11 @@ class Renderer :
         stats = self.get_stats()
         self.report.write( "measured by driver: \n" )
         for i in [ "begintime", "endtime", "totaltime", "exit_code" ]:
+            padded_i = (i + ":").ljust(11)
             if i in stats:
-                self.report.write( "\t" + i + ":  " + stats[ i ] + "\n" )
+                self.report.write( "\t" + padded_i + stats[ i ] + "\n" )
             else:
-                self.report.write( "\t" + i + ":  --no " + i + " recorded--\n" )
+                self.report.write( "\t" + padded_i + "--no " + i + " recorded--\n" )
 
 
     def render_validation( self, result ):
