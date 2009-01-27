@@ -18,6 +18,20 @@
       <format property="timenow" pattern="yyyyMMddHHmm" />
     </tstamp>
 
+    <!-- this special case makes sense -->
+    <condition property="os" value="windows">
+      <os family="Windows" />
+    </condition>
+    <condition property="windows" value="true">
+        <os family="Windows" />
+    </condition>
+    <condition property="os" value="linux">
+      <os name="linux" />
+    </condition>
+    <condition property="os" value="macosx">
+      <os name="mac os x" />
+    </condition>
+    
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
@@ -121,7 +135,7 @@
     </target>
 
     <target name="dist-package">
-        <tar tarfile="${targetdir}/mongo-${timenow}.tar.gz" longfile="gnu" compression="gzip">
+        <tar tarfile="${targetdir}/mongo-${os}-${os.arch}-${timenow}.tar.gz" longfile="gnu" compression="gzip">
 
             <tarfileset mode="754" dir="${targetdir}">
                 <include name="mongo-dist/bin/**"/>
