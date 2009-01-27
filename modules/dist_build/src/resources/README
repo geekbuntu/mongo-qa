@@ -6,8 +6,10 @@ Welcome to MongoDB!
 Package Contents
 ----------------
 
-  \bin\mongod - MongoDB server
-  \bin\mongo  - MongoDB client
+  \bin\mongod       - MongoDB server
+  \bin\mongo        - MongoDB client
+  \bin\mongodump    - MongoDB db export tool
+  \bin\mongoimport  - MongoDB db import tool
 
   \examples
   \docs

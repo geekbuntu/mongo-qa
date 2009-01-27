@@ -50,7 +50,7 @@
     <!--   SEOONDARY TARGETS -->
     
     <target name="setup" depends="mongo-checkout, v8-checkout"/>
-    <target name="build" depends="mongo-shell-build, mongo-build"/>
+    <target name="build" depends="v8-lib-build, mongo-full-build"/>
     <target name="update-code" depends="mongo-update, v8-update"/>
 
     <!-- ======================================================
@@ -68,10 +68,14 @@
         <mkdir dir="${supportedtoolsdir}"/>
         <mkdir dir="${communitytoolsdir}"/>
 
-        <!-- mongo and libs -->
 
-        <copy file="${workdir}/mongo/db/db" tofile="${bindir}/mongod"/>
-        <chmod file="${bindir}/mongod" perm="554"/>
+        <!-- mongo jars, libs, headers and binaries -->
+
+        <antcall target="mongo-install"/>
+        
+        <chmod file="${bindir}/**" perm="554"/>
+
+        <!-- jars and libs
 
         <copy todir="${libdir}">
            <fileset dir="${workdir}/mongo/lib/"/>
@@ -81,10 +85,16 @@
            <fileset dir="${workdir}/mongo/jars/"/>
         </copy>
 
-        <!-- dbshell -->
+
+        <copy file="${workdir}/mongo/db/db" tofile="${bindir}/mongod"/>
 
         <copy file="${workdir}/mongo/dbshell" tofile="${bindir}/mongo"/>
-        <chmod file="${bindir}/mongo" perm="554"/>
+
+        <copy file="${workdir}/mongo/mongodump" tofile="${bindir}/mongodump"/>
+
+        <copy file="${workdir}/mongo/mongoimport" tofile="${bindir}/mongoimport"/>
+
+-->
 
         <!-- general notices and info -->
         <copy todir="${distdir}">
@@ -152,8 +162,10 @@
             mongo targets
       ====================================================- -->
 
-    <target name="mongo-build">
-        <exec dir="${workdir}/mongo" executable="scons"/>
+    <target name="mongo-full-build">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="."/>
+        </exec>
     </target>
 
     <target name="mongo-clientlibrary-build" >
@@ -161,16 +173,29 @@
             <arg value="libmongoclient.a"/>
         </exec>
     </target>
-    
+
     <target name="mongo-shell-build" depends="v8-lib-build">
         <exec dir="${workdir}/mongo" executable="scons">
-            <arg value="dbshell"/>
+            <arg value="mongo"/>
+        </exec>
+    </target>
+
+    <target name="mongo-tools-build">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="mongodump mongoimport"/>
         </exec>
     </target>
 
     <target name="mongo-tests-build" >
         <exec dir="${workdir}/mongo" executable="scons">
             <arg value="test"/>
+        </exec>
+    </target>
+
+    <target name="mongo-install">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="--prefix"/>
+            <arg value="../../${distdir}"/>
         </exec>
     </target>
 
