@@ -24,9 +24,9 @@
 
     <!--   SEOONDARY TARGETS -->
     
-    <target name="setup" depends="mongo-shell-checkout, mongo-checkout, v8-checkout"/>
+    <target name="setup" depends="mongo-checkout, v8-checkout"/>
     <target name="build" depends="mongo-shell-build, mongo-build"/>
-    <target name="update-code" depends="mongo-update, mongo-shell-update, v8-update"/>
+    <target name="update-code" depends="mongo-update, v8-update"/>
 
     <!-- ======================================================
             packaging targets
@@ -41,8 +41,8 @@
 
         <!-- mongo and libs -->
 
-        <copy file="${workdir}/mongo/db/db" todir="${bindir}"/>
-        <chmod file="${bindir}/db" perm="554"/>
+        <copy file="${workdir}/mongo/db/db" tofile="${bindir}/mongod"/>
+        <chmod file="${bindir}/mongod" perm="554"/>
 
         <copy todir="${libdir}">
            <fileset dir="${workdir}/mongo/lib/"/>
@@ -54,8 +54,8 @@
 
         <!-- dbshell -->
 
-        <copy file="${workdir}/mongo-shell/dbshell" todir="${bindir}"/>
-        <chmod file="${bindir}/dbshell" perm="554"/>
+        <copy file="${workdir}/mongo/dbshell" tofile="${bindir}/mongo"/>
+        <chmod file="${bindir}/mongo" perm="554"/>
 
     </target>
 
@@ -70,6 +70,12 @@
     <target name="mongo-clientlibrary-build" >
         <exec dir="${workdir}/mongo" executable="scons">
             <arg value="libmongoclient.a"/>
+        </exec>
+    </target>
+    
+    <target name="mongo-shell-build" depends="v8-lib-build">
+        <exec dir="${workdir}/mongo" executable="scons">
+            <arg value="dbshell"/>
         </exec>
     </target>
 
@@ -95,27 +101,6 @@
     <target name="mongo-run-tests" depends="mongo-tests-build" >
         <mkdir dir="/tmp/unittest/"/>
         <exec executable="${workdir}/mongo/test"/>
-    </target>
-
-     <!-- ======================================================
-            mongo-shell targets
-      ====================================================- -->
-
-    <target name="mongo-shell-build" depends="v8-lib-build, mongo-clientlibrary-build">
-        <exec dir="${workdir}/mongo-shell" executable="scons"/>
-    </target>
-
-    <target name="mongo-shell-checkout">
-        <exec dir="${workdir}" executable="git">
-          <arg value="clone"/>
-          <arg value="git://github.com/mongodb/mongo-shell.git"/>
-        </exec>
-    </target>
-
-    <target name="mongo-shell-update">
-        <exec dir="${workdir}/mongo-shell" executable="git">
-          <arg value="pull"/>
-        </exec>
     </target>
 
 
