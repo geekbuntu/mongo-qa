@@ -75,28 +75,8 @@
         
         <chmod file="${bindir}/**" perm="554"/>
 
-        <!-- jars and libs
-
-        <copy todir="${libdir}">
-           <fileset dir="${workdir}/mongo/lib/"/>
-        </copy>
-
-        <copy todir="${jarsdir}">
-           <fileset dir="${workdir}/mongo/jars/"/>
-        </copy>
-
-
-        <copy file="${workdir}/mongo/db/db" tofile="${bindir}/mongod"/>
-
-        <copy file="${workdir}/mongo/dbshell" tofile="${bindir}/mongo"/>
-
-        <copy file="${workdir}/mongo/mongodump" tofile="${bindir}/mongodump"/>
-
-        <copy file="${workdir}/mongo/mongoimport" tofile="${bindir}/mongoimport"/>
-
--->
-
         <!-- general notices and info -->
+
         <copy todir="${distdir}">
             <fileset dir="${srcdir}/resources">
                 <exclude name="DRIVERS_AND_TOOLS_INFO"/>
@@ -107,40 +87,40 @@
 
         <!-- supported drivers and tools - be dumb for now -->
 
-        <exec dir="${supportedtoolsdir}" executable="git">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
          </exec>
 
-        <exec dir="${supportedtoolsdir}" executable="git">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
          </exec>
 
-        <exec dir="${supportedtoolsdir}" executable="git">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
          </exec>
 
-        <exec dir="${supportedtoolsdir}/mongo-java-driver" executable="ant">
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" failonerror="true" executable="ant">
            <arg value="jar"/>
         </exec>
 
         <!-- community drivers and tools - be dumb for now -->
 
-        <exec dir="${communitytoolsdir}" executable="git">
+        <exec dir="${communitytoolsdir}" failonerror="true" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/geir/mongo-java-driver.git"/>
          </exec>
 
-        <exec dir="${communitytoolsdir}/mongo-java-driver" executable="ant"/>
+        <exec dir="${communitytoolsdir}/mongo-java-driver" failonerror="true" executable="ant"/>
 
-        <exec dir="${communitytoolsdir}" executable="git">
+        <exec dir="${communitytoolsdir}" failonerror="true" executable="git">
            <arg value="clone"/>
            <arg value="git://github.com/geir/mongo-message-monitor.git"/>
          </exec>
 
-        <exec dir="${communitytoolsdir}/mongo-message-monitor" executable="ant"/>
+        <exec dir="${communitytoolsdir}/mongo-message-monitor" failonerror="true" executable="ant"/>
 
     </target>
 
@@ -163,58 +143,58 @@
       ====================================================- -->
 
     <target name="mongo-full-build">
-        <exec dir="${workdir}/mongo" executable="scons">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="."/>
         </exec>
     </target>
 
     <target name="mongo-clientlibrary-build" >
-        <exec dir="${workdir}/mongo" executable="scons">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="libmongoclient.a"/>
         </exec>
     </target>
 
     <target name="mongo-shell-build" depends="v8-lib-build">
-        <exec dir="${workdir}/mongo" executable="scons">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="mongo"/>
         </exec>
     </target>
 
     <target name="mongo-tools-build">
-        <exec dir="${workdir}/mongo" executable="scons">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="mongodump mongoimport"/>
         </exec>
     </target>
 
     <target name="mongo-tests-build" >
-        <exec dir="${workdir}/mongo" executable="scons">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="test"/>
         </exec>
     </target>
 
     <target name="mongo-install">
-        <exec dir="${workdir}/mongo" executable="scons">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="--prefix"/>
             <arg value="../../${distdir}"/>
         </exec>
     </target>
 
     <target name="mongo-checkout">
-        <exec dir="${workdir}" executable="git">
+        <exec dir="${workdir}" failonerror="true" executable="git">
           <arg value="clone"/>
           <arg value="git://github.com/mongodb/mongo.git"/>
         </exec>
     </target>
 
     <target name="mongo-update">
-        <exec dir="${workdir}/mongo" executable="git">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="git">
           <arg value="pull"/>
         </exec>
     </target>
 
     <target name="mongo-run-tests" depends="mongo-tests-build" >
         <mkdir dir="/tmp/unittest/"/>
-        <exec executable="${workdir}/mongo/test"/>
+        <exec failonerror="true" executable="${workdir}/mongo/test"/>
     </target>
 
 
@@ -223,13 +203,13 @@
       ====================================================- -->
 
     <target name="v8-lib-build">
-        <exec dir="${workdir}/v8" executable="scons">
+        <exec dir="${workdir}/v8" failonerror="true"  executable="scons">
             <arg value="libv8.a"/>
         </exec>
     </target>
 
     <target name="v8-checkout">
-        <exec dir="${workdir}" executable="svn">
+        <exec dir="${workdir}" failonerror="true" executable="svn">
           <arg value="checkout"/>
           <arg value="http://v8.googlecode.com/svn/trunk/"/>
           <arg value="v8"/>
@@ -237,22 +217,9 @@
     </target>
 
     <target name="v8-update">
-        <exec dir="${workdir}/v8" executable="svn">
+        <exec dir="${workdir}/v8" failonerror="true" executable="svn">
           <arg value="update"/>
         </exec>
     </target>
-
-
-    <!-- ========================================================
-           python driver and tools
-    =========================================================== -->
-
-    <!-- ========================================================
-           ruby driver and tools
-    =========================================================== -->
-
-    <!-- ========================================================
-           java driver and tools
-    =========================================================== -->
 
 </project>
