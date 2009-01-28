@@ -1,3 +1,7 @@
+setup:
+        1. drop capped1
+        2. drop capped2
+
 driver:
         1. create a capped collection capped1 with size 500
         2. add to capped1

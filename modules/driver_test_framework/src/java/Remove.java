@@ -7,9 +7,12 @@ import com.mongodb.util.*;
 
 public class Remove {
 
-    public static void seed() 
+    public static void setup() 
         throws UnknownHostException {
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/remove" ) );
+        m.getCollection( "remove1" ).drop();
+        m.getCollection( "remove2" ).drop();
+
         DBCollection coll1 = m.getCollection( "remove1" );
         for( int i=0; i<50; i++) {
             DBObject obj = new BasicDBObject();

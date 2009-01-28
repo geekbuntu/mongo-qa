@@ -1,3 +1,8 @@
+setup:
+        1. drop a
+        2. drop b
+        3. drop c
+
 driver:
         1. create collections a and b
         2. save { c : b } in a

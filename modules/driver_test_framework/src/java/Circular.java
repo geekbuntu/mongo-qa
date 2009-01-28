@@ -6,6 +6,15 @@ import com.mongodb.*;
 import com.mongodb.util.*;
 
 public class Circular {
+    public static void setup() 
+        throws UnknownHostException {
+
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/circular" ) );
+        m.getCollection( "a" ).drop();
+        m.getCollection( "b" ).drop();
+        m.getCollection( "c" ).drop();
+    }
+
     public static void main( String[] args ) 
         throws UnknownHostException {
 

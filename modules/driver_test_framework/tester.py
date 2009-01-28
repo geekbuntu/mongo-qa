@@ -7,7 +7,7 @@ from datetime import datetime
 ID = datetime.now().isoformat()
 
 TEST_DIR = "/src"
-PREP_DIR = "/pre"
+PREP_DIR = "/setup"
 VALIDATION_DIR = "/validate"
 OUTPUT_DIR = "/out"
 TEMP_FILE = "temp_" + ID
@@ -146,7 +146,9 @@ class Driver (Summarizable):
             self.name = temp[0]
             self.path = temp[1]
         except IndexError:
-            print "improperly formatted argument: " + driver + ".  skipping..."
+            print "improperly formatted argument: " + driver + "." 
+            print "try driver-name=" + driver + " next time"
+            print "skipping " + driver + "..."
         Summarizable.__init__( self )
 
     def is_valid( self ):
@@ -178,6 +180,9 @@ class Framework (Summarizable):
 
     # run all tests on all drivers
     def run_all( self ):
+        if len( sys.argv ) < 2:
+            print "No driver paths given, exiting"
+
         for d in sys.argv[1:]:
             driver = Driver( d )
             if not driver.is_valid():

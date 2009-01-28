@@ -6,6 +6,13 @@ import com.mongodb.*;
 import com.mongodb.util.*;
 
 public class Find {
+    public static void setup() 
+        throws UnknownHostException {
+
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/find" ) );
+        m.getCollection( "test" ).drop();
+    }
+
     public static void main( String[] args ) 
         throws UnknownHostException {
 

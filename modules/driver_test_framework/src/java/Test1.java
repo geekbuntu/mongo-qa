@@ -6,6 +6,12 @@ import com.mongodb.*;
 import com.mongodb.util.*;
 
 public class Test1 {
+    public static void setup() 
+        throws UnknownHostException {
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/test1" ) );
+        m.getCollection( "part1" ).drop();
+    }
+
     public static void main( String[] args ) 
         throws UnknownHostException {
 

@@ -1,3 +1,6 @@
+setup:
+        1. drop test
+
 driver:
         1. Create a collection called test
         2. Add one element to it: { a : 2 }

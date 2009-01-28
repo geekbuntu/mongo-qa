@@ -6,6 +6,14 @@ import com.mongodb.*;
 import com.mongodb.util.*;
 
 public class Capped {
+ 
+    public static void setup() 
+        throws UnknownHostException {
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/capped" ) );
+        m.getCollection( "capped1" ).drop();
+        m.getCollection( "capped2" ).drop();
+    }
+
     public static void main( String[] args ) 
         throws UnknownHostException {
 
@@ -20,6 +28,7 @@ public class Capped {
         sortObj.put( "$natural", -1 );
         MyAsserts.assertEquals( 2, ((Integer)coll1.find().sort( sortObj ).next().get( "x" )).intValue() );
 
+        coll1 = m.getCollection( "capped2" );
         // make sure it's capped 
         for( int i=0; i<100; i++ ) {
             DBObject obj = new BasicDBObject();
