@@ -8,14 +8,14 @@ import com.mongodb.util.*;
 public class Test1 {
     public static void setup() 
         throws UnknownHostException {
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/test1" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         m.getCollection( "part1" ).drop();
     }
 
     public static void main( String[] args ) 
         throws UnknownHostException {
 
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/test1" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         DBCollection coll = m.getCollection( "part1" );
 
         DBObject sortObj = new BasicDBObject();

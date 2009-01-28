@@ -9,7 +9,7 @@ public class Remove {
 
     public static void setup() 
         throws UnknownHostException {
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/remove" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         m.getCollection( "remove1" ).drop();
         m.getCollection( "remove2" ).drop();
 
@@ -41,7 +41,7 @@ public class Remove {
     public static void main( String[] args ) 
         throws UnknownHostException {
 
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/remove" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         DBCollection coll1 = m.getCollection( "remove1" );
 
         MyAsserts.assertEquals( 0, coll1.find().count() ); 

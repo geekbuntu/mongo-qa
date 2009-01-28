@@ -9,7 +9,7 @@ public class Capped {
  
     public static void setup() 
         throws UnknownHostException {
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/capped" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         m.getCollection( "capped1" ).drop();
         m.getCollection( "capped2" ).drop();
     }
@@ -17,7 +17,7 @@ public class Capped {
     public static void main( String[] args ) 
         throws UnknownHostException {
 
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/capped" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         DBCollection coll1 = m.getCollection( "capped1" );
 
         MyAsserts.assertEquals( 2, coll1.find().count() ); 

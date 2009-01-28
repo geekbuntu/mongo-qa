@@ -9,7 +9,7 @@ public class Count1 {
  
     public static void setup() 
         throws UnknownHostException {
-        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/count1" ) );
+        Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         m.getCollection( "test1" ).drop();
 
         DBCollection foo = m.getCollection( "test2" );
