@@ -6,10 +6,10 @@ from datetime import datetime
 
 ID = datetime.now().isoformat()
 
-TEST_DIR = "/src"
-PREP_DIR = "/setup"
-VALIDATION_DIR = "/validate"
-OUTPUT_DIR = "/out"
+TEST_DIR = "src"
+PREP_DIR = "setup"
+VALIDATION_DIR = "validate"
+OUTPUT_DIR = "output"
 TEMP_FILE = "temp_" + ID
 
 class Renderer :
@@ -169,14 +169,14 @@ class Driver (Summarizable):
 
     def get_unique_path( self, test_dir, test ):
         # a unique location for this driver/test/run's files:
-        #     TEST_DIR/driver_name/test_ID
+        #     OUTPUT_DIR/driver_name/test_ID
         driver_dir = self.get_dir( test_dir );
         return driver_dir + "/" + test + "_" + ID
 
 class Framework (Summarizable):
     def __init__( self ):
-        self.test_dir = os.curdir + TEST_DIR
-        self.tests = os.listdir( self.test_dir + VALIDATION_DIR )
+        self.test_dir = os.getcwd() + "/"
+        self.tests = os.listdir( VALIDATION_DIR )
         Summarizable.__init__( self )
 
     # run all tests on all drivers
@@ -198,7 +198,7 @@ class Framework (Summarizable):
     def run_all_driver( self, driver ):
         for test in self.tests:
             # if there is a pre-test file to run, do so
-            prep = self.test_dir + PREP_DIR + "/" + test
+            prep = PREP_DIR + "/" + test
             if os.path.exists( prep ):
                 subprocess.call( [prep] )
             self.run_test( driver, test )
@@ -206,19 +206,15 @@ class Framework (Summarizable):
     # run a specific test on a given driver
     def run_test( self, driver, test ):
         # file locations
-        out = driver.get_unique_path( self.test_dir, test ) + ".out"
-        report = driver.get_unique_path( self.test_dir, test ) + ".report"
-        perfect_out = self.test_dir + OUTPUT_DIR + "/" + test + ".out"
+        out = driver.get_unique_path( OUTPUT_DIR, test ) + ".out"
+        report = driver.get_unique_path( OUTPUT_DIR, test ) + ".report"
+        perfect_out = OUTPUT_DIR + "/" + test + ".out"
 
         # run test
         timing_result = self.run_timed_test( driver, test, out, {} );
 
         # validate
-        validation_result = None
-        try:
-            validation_result = self.run_validation_test( test, {} )
-        except OSError:
-            print "OSError: are the permissions correct for " + VALIDATION_DIR + "/" + test + "?\n"
+        validation_result = self.run_validation_test( test, {} )
 
         passed = self.check_results( timing_result, validation_result )
         self.add_to_stats( passed )
@@ -237,13 +233,13 @@ class Framework (Summarizable):
         output = os.path.abspath(output)
         os.chdir(os.path.dirname(driver.get_path()))
         result[ "begin" ] = datetime.now()
-        result[ "exit_code" ] = subprocess.call( [driver.get_path(), test, output] )
+        result[ "exit_code" ] = subprocess.call( [self.test_dir + driver.get_path(), test, output] )
         result[ "end" ] = datetime.now()
         os.chdir(old_path)
         return result
 
     def run_validation_test( self, test, result ):
-        validate_script = self.test_dir + "/validate/" + test
+        validate_script = VALIDATION_DIR + "/" + test
         result[ "exit_code" ] = subprocess.call( [ validate_script, TEMP_FILE ] )
         return result
 

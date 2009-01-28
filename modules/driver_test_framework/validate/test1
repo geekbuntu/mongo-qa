@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [[ $# -eq 0 ]]; then
+    out=/dev/null
+else
+    out=$1
+fi
+
+cd src/java/;
+java Test1 >& out
+
+exit $?

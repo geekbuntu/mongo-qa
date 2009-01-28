@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd src/java/;
-java Test1 >& $1
-
-exit $?
