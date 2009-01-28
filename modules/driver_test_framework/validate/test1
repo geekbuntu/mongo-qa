@@ -7,6 +7,6 @@ else
 fi
 
 cd src/java/;
-java Test1 >& out
+java Test1 >& $out
 
 exit $?

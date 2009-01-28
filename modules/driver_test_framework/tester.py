@@ -10,7 +10,7 @@ TEST_DIR = "src"
 PREP_DIR = "setup"
 VALIDATION_DIR = "validate"
 OUTPUT_DIR = "output"
-TEMP_FILE = "temp_" + ID
+TEMP_FILE = os.getcwd() + "/temp_" + ID
 
 class Renderer :
     def __init__(self, output, p_output, report):
@@ -29,27 +29,22 @@ class Renderer :
 
         self.report = open( report, 'w' )
 
+    def render( self, test, driver, timing, diff, valid ):
+        self.render_header( test, driver )
+        self.render_stats( timing )
+        self.render_diff( diff )
+        self.render_validation( valid )
+        self.cleanup()
+
     def render_header( self, test, driver ):
         self.report.write( "RESULTS FOR " + test + "\n" )
         self.report.write( "\tRUN BY: " + driver + "\n" )
         self.report.write( "\tDATE: " + ID + "\n\n" )
 
-    def render_diff( self ):
-        if not self.p_output:
-            return
-
-        # create diff
-        diffcount = 0
-        for line1 in self.p_output:
-            line2 = self.output.readline()
-            if line2 != line1 :
-                self.report.write( "L" + str(count) + ":\n" )
-                self.report.write( "> " + line1 + "\n" )
-                self.report.write( "< " + line2 + "\n" )
-                diffcount += 1
-
-        if diffcount > 0:
-            self.report.write( "Number of incorrect output lines: " + str(diffcount) +"\n\n" )
+    def render_diff( self, num ):
+        if num > 0:
+            self.report.write( "FAILED DIFF\n" )
+            self.report.write( "\nNumber of incorrect output lines: " + str( num ) +"\n\n" )
 
     # gather reporting info at the end of the output
     def get_stats( self ):
@@ -73,7 +68,6 @@ class Renderer :
         self.report.write( "\ttotaltime: " + str(result[ "end" ] - result[ "begin" ]) + "\n" )
         self.report.write( "\texit_code: " + str(result["exit_code"]) +"\n\n" )
 
-        print "calling stats"
         stats = self.get_stats()
         self.report.write( "measured by driver: \n" )
         for i in [ "begintime", "endtime", "totaltime", "exit_code" ]:
@@ -203,20 +197,21 @@ class Framework (Summarizable):
         # run test
         timing_result = self.run_timed_test( driver, test, out, {} );
 
+        # diff results
+        diff_result = 0
+        if os.path.exists( perfect_out ):
+            diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) );
+
         # validate
         validation_result = self.run_validation_test( test, {} )
 
-        passed = self.check_results( timing_result, validation_result )
+        passed = self.check_results( timing_result, validation_result, diff_result )
         self.add_to_stats( passed )
         driver.add_to_stats( passed )
 
         # report output
         r = Renderer( out, perfect_out, report )
-        r.render_header( test, driver.get_name() )
-        r.render_diff()
-        r.render_stats( timing_result )
-        r.render_validation( validation_result )
-        r.cleanup()
+        r.render( test, driver.get_name(), timing_result, diff_result, validation_result )
 
     def run_timed_test( self, driver, test, output, result ):
         old_path = os.getcwd()
@@ -233,18 +228,27 @@ class Framework (Summarizable):
         result[ "exit_code" ] = subprocess.call( [ validate_script, TEMP_FILE ] )
         return result
 
-    def check_results( self, result1, result2 ):
+    def diff_test( self, out1, out2 ):
+        count = 0
+        for line2 in out2:
+            line1 = out1.readline()
+            if line2 != line1 :
+                count += 1
+        return count
+
+    def check_results( self, result1, result2, result3 ):
         if result1 and "exit_code" in result1 and result1[ "exit_code" ] == 0:
             if result2 and "exit_code" in result2 and result2[ "exit_code" ] == 0:
-                print "."
-                return 1
+                if result3 == 0:
+                    print "."
+                    return 1
         print "F"
         return 0
 
 
 
 if len( sys.argv ) < 2:
-    print "No driver paths given, exiting"
+    print "No drivers given, exiting"
 
 driver_num = 1
 drivers = []
