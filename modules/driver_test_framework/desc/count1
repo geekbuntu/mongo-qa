@@ -1,0 +1,17 @@
+setup:
+        1. drop test1
+        2. drop test2
+        3. test2.save({ name  : "a" })
+        4. drop test3
+        5. for j=0 to 99
+               test3.save( { i : j, foo : "bar" } )
+
+driver:
+        1. print test1.find().count()
+        2. print test2.find().count()
+        3. print test3.find({ i : "a" }).count()
+        4. print test3.find({ i : 3 }).count()
+        5. print test3.find({ i : { $gte : 67 } }).count()
+
+validator:
+        1. output matches expected output

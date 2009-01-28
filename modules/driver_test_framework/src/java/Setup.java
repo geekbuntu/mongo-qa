@@ -17,6 +17,8 @@ public class Setup {
             Capped.setup();
         else if( testname.equals( "circular" ) )
             Circular.setup(); 
+        else if( testname.equals( "count1" ) )
+            Count1.setup();
         else if( testname.equals( "find" ) )
             Find.setup(); 
         else if( testname.equals( "remove" ) )
