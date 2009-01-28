@@ -141,15 +141,9 @@ class Summarizable:
         return datetime.now() - self.start_time
 
 class Driver (Summarizable):
-    def __init__( self, d ):
-        try:
-            temp = d.split( "=" )
-            self.name = temp[0]
-            self.path = temp[1]
-        except IndexError:
-            print "improperly formatted argument: " + driver + "." 
-            print "try driver-name=" + driver + " next time"
-            print "skipping " + driver + "..."
+    def __init__( self, name, path ):
+        self.name = name
+        self.path = path
         Summarizable.__init__( self )
 
     def is_valid( self ):
@@ -180,17 +174,13 @@ class Framework (Summarizable):
         Summarizable.__init__( self )
 
     # run all tests on all drivers
-    def run_all( self ):
-        if len( sys.argv ) < 2:
-            print "No driver paths given, exiting"
-
-        for d in sys.argv[1:]:
-            driver = Driver( d )
+    def run_all( self, drivers ):
+        for driver in drivers:
             if not driver.is_valid():
                 continue
 
             self.run_all_driver( driver );
-            if len( sys.argv ) > 2:
+            if len( drivers ) != 1:
                 driver.summarize( "Driver " + driver.get_name() )
         self.summarize( "----------------------------\nAll tests" )
 
@@ -252,5 +242,21 @@ class Framework (Summarizable):
         return 0
 
 
+
+if len( sys.argv ) < 2:
+    print "No driver paths given, exiting"
+
+driver_num = 1
+drivers = []
+for d in sys.argv[1:]:
+    if d.find( "=" ) > 0:
+        temp = d.split( "=" )
+        drivers.append( Driver( temp[0], temp[1] ) )
+    else:
+        drivers.append( Driver( "driver" + str( driver_num ), d ) )
+
+    driver_num += 1;
+
+
 f = Framework()
-f.run_all()
+f.run_all( drivers )

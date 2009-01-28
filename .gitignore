@@ -2,4 +2,6 @@
 modules/dist_build/workdir
 modules/dist_build/target
 *.class
+*.out
+*.report
 
