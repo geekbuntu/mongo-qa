@@ -176,6 +176,7 @@
         <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="--prefix"/>
             <arg value="../../${distdir}"/>
+            <arg value="install"/>
         </exec>
     </target>
 
