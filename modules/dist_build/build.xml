@@ -43,14 +43,13 @@
 
     <!--   PRIMARY TARGETS -->
 
-    <target name="dist" depends="clean-build, make-dist" description="Clean build and packaging of Mongo distribution"/>
-    <target name="clean-build" depends="clean, init, setup, build" description="Create a fresh checkout and build of mongo and dbshell"/>
-    <target name="update-build" depends="update-code, build" description="After a clean-build, incrementally update code and re-build all"/>
+    <target name="dist" depends="clean, init, setup, make-dist" description="Clean build and packaging of Mongo distribution"/>
+    <target name="clean-build" depends="clean, init, setup, mongo-full-build" description="Create a fresh checkout and build of mongo and dbshell"/>
+    <target name="update-build" depends="update-code, mongo-full-build" description="After a clean-build, incrementally update code and re-build all"/>
 
     <!--   SEOONDARY TARGETS -->
     
     <target name="setup" depends="mongo-checkout, v8-checkout"/>
-    <target name="build" depends="v8-lib-build, mongo-full-build"/>
     <target name="update-code" depends="mongo-update, v8-update"/>
 
     <!-- ======================================================
@@ -61,7 +60,7 @@
 
     <target name="dist-setup">
 
-        <delete failonerror="false" dir="${distdir}"/>
+        <delete failonerror="false" dir="${targetdir}"/>
         <mkdir dir="${distdir}"/>
         <mkdir dir="${bindir}"/>
         <mkdir dir="${libdir}"/>
@@ -142,38 +141,15 @@
             mongo targets
       ====================================================- -->
 
-    <target name="mongo-full-build">
+    <target name="mongo-full-build" depends="v8-lib-build">
         <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="."/>
         </exec>
     </target>
 
-    <target name="mongo-clientlibrary-build" >
+    <target name="mongo-install" depends="v8-lib-build">
         <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
-            <arg value="libmongoclient.a"/>
-        </exec>
-    </target>
-
-    <target name="mongo-shell-build" depends="v8-lib-build">
-        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
-            <arg value="mongo"/>
-        </exec>
-    </target>
-
-    <target name="mongo-tools-build">
-        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
-            <arg value="mongodump mongoimport"/>
-        </exec>
-    </target>
-
-    <target name="mongo-tests-build" >
-        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
-            <arg value="test"/>
-        </exec>
-    </target>
-
-    <target name="mongo-install">
-        <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
+            <arg value="--release"/>
             <arg value="--prefix"/>
             <arg value="../../${distdir}"/>
             <arg value="install"/>
@@ -192,12 +168,6 @@
           <arg value="pull"/>
         </exec>
     </target>
-
-    <target name="mongo-run-tests" depends="mongo-tests-build" >
-        <mkdir dir="/tmp/unittest/"/>
-        <exec failonerror="true" executable="${workdir}/mongo/test"/>
-    </target>
-
 
     <!-- ======================================================
             V8 targets
