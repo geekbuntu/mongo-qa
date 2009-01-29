@@ -138,6 +138,7 @@ class Driver (Summarizable):
     def __init__( self, name, path ):
         self.name = name
         self.path = path
+        self.get_dir( OUTPUT_DIR )
         Summarizable.__init__( self )
 
     def is_valid( self ):
@@ -169,23 +170,27 @@ class Framework (Summarizable):
 
     # run all tests on all drivers
     def run_all( self, drivers ):
+        passed = True
         for driver in drivers:
             if not driver.is_valid():
                 continue
 
-            self.run_all_driver( driver );
+            passed = passed and self.run_all_driver( driver );
             if len( drivers ) != 1:
                 driver.summarize( "Driver " + driver.get_name() )
         self.summarize( "----------------------------\nAll tests" )
+        return passed
 
     # run all tests on a given driver
     def run_all_driver( self, driver ):
+        passed = True
         for test in self.tests:
             # if there is a pre-test file to run, do so
             prep = PREP_DIR + "/" + test
             if os.path.exists( prep ):
                 subprocess.call( [prep] )
-            self.run_test( driver, test )
+            passed = passed and self.run_test( driver, test )
+        return passed
 
     # run a specific test on a given driver
     def run_test( self, driver, test ):
@@ -200,7 +205,10 @@ class Framework (Summarizable):
         # diff results
         diff_result = 0
         if os.path.exists( perfect_out ):
-            diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) );
+            if os.path.exists( out ):
+                diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) );
+            else:
+                diff_result = 1
 
         # validate
         validation_result = self.run_validation_test( test, {} )
@@ -212,6 +220,7 @@ class Framework (Summarizable):
         # report output
         r = Renderer( out, perfect_out, report )
         r.render( test, driver.get_name(), timing_result, diff_result, validation_result )
+        return ( passed == 1 )
 
     def run_timed_test( self, driver, test, output, result ):
         old_path = os.getcwd()
@@ -249,6 +258,7 @@ class Framework (Summarizable):
 
 if len( sys.argv ) < 2:
     print "No drivers given, exiting"
+    exit( 0 )
 
 driver_num = 1
 drivers = []
@@ -263,4 +273,8 @@ for d in sys.argv[1:]:
 
 
 f = Framework()
-f.run_all( drivers )
+passed = f.run_all( drivers )
+if passed:
+    exit( 0 )
+else:
+    exit( 1 )
