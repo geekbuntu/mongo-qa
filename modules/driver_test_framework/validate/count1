@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd src/java/;
+cd src/java/build;
 java Count1 >& $1
 
 exit $?

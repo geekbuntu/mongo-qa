@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<project name="Validators" default="compile" basedir=".">
+
+  <path id="classpath">
+    <pathelement path="src/build" />
+  </path>
+
+  <target name="init">
+    <mkdir dir="src/java/build" />
+  </target>
+
+  <target name="clean">
+    <delete dir="src/java/build"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="src/java"
+           destdir="src/java/build"
+           optimize="off"
+           deprecation="off"
+           source="1.5"
+           encoding="ISO-8859-1"
+           memoryMaximumSize="256M"
+           fork="true"
+           debug="on" >
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <target name="rebuild" depends="clean, compile"/>
+</project>
