@@ -86,24 +86,10 @@
 
         <!-- supported drivers and tools - be dumb for now -->
 
-        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
-           <arg value="clone"/>
-           <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
-         </exec>
-
-        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
-           <arg value="clone"/>
-           <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
-         </exec>
-
-        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
-           <arg value="clone"/>
-           <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
-         </exec>
-
-        <exec dir="${supportedtoolsdir}/mongo-java-driver" failonerror="true" executable="ant">
-           <arg value="jar"/>
-        </exec>
+        <antcall target="ruby-driver-dist"/>
+        <antcall target="python-driver-dist"/>
+        <antcall target="java-driver-dist"/>
+        <antcall target="mongo-docs-dist"/>
 
         <!-- community drivers and tools - be dumb for now -->
 
@@ -137,6 +123,7 @@
 
             </tar>
     </target>
+    
     <!-- ======================================================
             mongo targets
       ====================================================- -->
@@ -144,6 +131,18 @@
     <target name="mongo-full-build" depends="v8-lib-build">
         <exec dir="${workdir}/mongo" failonerror="true" executable="scons">
             <arg value="."/>
+        </exec>
+    </target>
+
+    <target name="mongo-docs-dist" depends="mongo-docs">
+        <copy todir="${distdir}/docs">
+            <fileset dir="${workdir}/mongo/docs"/>
+        </copy>
+    </target>
+
+    <target name="mongo-docs">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="doxygen">
+            <arg value="doxygenConfig"/>
         </exec>
     </target>
 
@@ -191,6 +190,52 @@
         <exec dir="${workdir}/v8" failonerror="true" executable="svn">
           <arg value="update"/>
         </exec>
+    </target>
+
+    <!-- ======================================================
+            Supported Driver distribution targets
+      ====================================================- -->
+
+    <target name="ruby-driver-dist">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
+         </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-ruby-driver" failonerror="true" executable="rake">
+           <arg value="rdoc"/>
+         </exec>
+    </target>
+
+    <target name="python-driver-dist">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
+         </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-python-driver" failonerror="true" executable="epydoc">
+            <arg value="--config"/>
+            <arg value="epydoc-config"/>            
+         </exec>
+    </target>
+
+    <target name="java-driver-dist">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
+         </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" failonerror="true" executable="ant">
+           <arg value="jar"/>
+        </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" failonerror="true" executable="ant">
+           <arg value="javadocs"/>
+        </exec>
+
+        <!-- remove the build artifacts (.class files) and the testng jar -->
+        <delete dir="${supportedtoolsdir}/mongo-java-driver/build"/>
+        <delete dir="${supportedtoolsdir}/mongo-java-driver/include"/>        
     </target>
 
 </project>
