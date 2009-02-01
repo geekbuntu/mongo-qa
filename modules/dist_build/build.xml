@@ -89,7 +89,7 @@
         <antcall target="ruby-driver-dist"/>
         <antcall target="python-driver-dist"/>
         <antcall target="java-driver-dist"/>
-        <antcall target="mongo-docs-dist"/>
+        <!-- <antcall target="mongo-docs-dist"/> -->
 
         <!-- community drivers and tools - be dumb for now -->
 
