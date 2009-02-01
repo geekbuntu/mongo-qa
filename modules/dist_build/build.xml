@@ -141,7 +141,7 @@
     </target>
 
     <target name="mongo-docs">
-        <mkdir dir="${workdir}/mongo"/>
+        <mkdir dir="${workdir}/mongo/docs"/>
         <exec dir="${workdir}/mongo" failonerror="true" executable="doxygen">
             <arg value="doxygenConfig"/>
         </exec>
