@@ -163,7 +163,7 @@ class Driver (Summarizable):
         # a unique location for this driver/test/run's files:
         #     OUTPUT_DIR/driver_name/test_ID
         driver_dir = self.get_dir( test_dir )
-        return driver_dir + "/" + test + "_" + ID
+        return driver_dir + "/" + ID + "_" + test
 
 class Framework (Summarizable):
     def __init__( self ):
@@ -215,6 +215,7 @@ class Framework (Summarizable):
         if not self.check_results( timing_result ):
             self.add_to_stats( False )
             driver.add_to_stats( False )
+            print "driver " + driver.get_name() + " failed to run " + test
             return False
 
         # diff results
@@ -223,9 +224,14 @@ class Framework (Summarizable):
                 diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) )
         else:
             diff_result = { "exit_code" : 0 }
+        if not self.check_results( diff_result ):
+            print "driver " + driver.get_name() + ":" + test + " generated incorrect output"
 
         # validate
         validation_result = self.run_validation_test( test, {} )
+        if not self.check_results( validation_result ):
+            print "driver " + driver.get_name() + ":" + test + " failed validation"
+
         passed = self.check_results( validation_result ) and self.check_results( diff_result )
         self.add_to_stats( passed )
         driver.add_to_stats( passed )
