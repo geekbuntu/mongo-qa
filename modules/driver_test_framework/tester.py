@@ -193,6 +193,10 @@ class Framework (Summarizable):
             if os.path.exists( prep ):
                 subprocess.call( [prep] )
             p = self.run_test( driver, test )
+            if p:
+                print test + ".",
+            else:
+                print test + "F",
             passed = passed and p
         return passed
 
@@ -218,18 +222,13 @@ class Framework (Summarizable):
             if os.path.exists( out ):
                 diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) )
         else:
-            diff_result = {}
+            diff_result = { "exit_code" : 0 }
 
         # validate
         validation_result = self.run_validation_test( test, {} )
-
-        passed = self.check_results( validation_result ) and diff_result
+        passed = self.check_results( validation_result ) and self.check_results( diff_result )
         self.add_to_stats( passed )
         driver.add_to_stats( passed )
-        if passed:
-            print ".",
-        else:
-            print "F",
 
         # report output
         r = Renderer( out, perfect_out, report )
