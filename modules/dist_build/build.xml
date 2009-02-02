@@ -136,6 +136,37 @@
             </tar>
     </target>
 
+    <target name="upload-docs">
+
+        <!-- we have to generate C docs since doxygen is flakey on linux atm -->
+        <antcall target="mongo-docs-dist"/>
+
+        <!-- upload the C++ docs -->
+        <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
+            <arg value="${targetdir}/mongo-dist/docs/html"/>
+            <arg value="c"/>
+        </exec>
+
+        <!-- upload the python docs -->
+        <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
+            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-python-driver/doc"/>
+            <arg value="python"/>
+        </exec>
+
+        <!-- upload the ruby docs -->
+        <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
+            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-ruby-driver/html"/>
+            <arg value="ruby"/>
+        </exec>
+
+        <!-- upload the java docs -->
+        <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
+            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-java-driver/docs"/>
+            <arg value="java"/>
+        </exec>
+
+    </target>
+
     <target name="upload-dist" depends="gen-redirect-file" >
 
         <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
