@@ -6,11 +6,10 @@
 
 for i in 1 2 3 4 5 6 7 8 9 ; do
   echo "Git attempt $i"
+  sleep 2
   git $@
   if [ $? -eq 0 ]; then
     break
-  else
-    sleep 2
   fi
 done
 

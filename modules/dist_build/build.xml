@@ -31,9 +31,18 @@
     <condition property="os" value="osx">
       <os name="mac os x" />
     </condition>
-    
 
-    <property name="distfilename" value="mongodb-${os}-${os.arch}-${timenow}.tar.gz"/>
+    <!-- make our own because the JVM produces silly values for 64-bit -->
+    <condition property="os-arch" value="x86_64">
+       <os arch="amd64"/>
+    </condition>
+
+    <condition property="os-arch" value="i386">
+       <os arch="i386"/>
+    </condition>
+    
+    <property name="distfilename" value="mongodb-${os}-${os-arch}-${timenow}.tar.gz"/>
+    <property name="latestfilename" value="latest-${os-arch}.html"/>
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
@@ -127,11 +136,12 @@
             </tar>
     </target>
 
-    <target name="upload-dist" depends="gen-redirect-file" description="builds and uploads a distribution">
+    <target name="upload-dist" depends="gen-redirect-file" >
 
         <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
             <arg value="${targetdir}/${distfilename}"/>
             <arg value="${os}"/>
+            <arg value="${latestfilename}"/>
             <arg value="${distfilename}"/>
         </exec>
 
@@ -141,7 +151,7 @@
         <filter token="platform" value="${os}"/>
         <filter token="distfilename" value="${distfilename}"/>
 
-        <copy filtering="true" file="${srcdir}/pages/latest_redirect_template.html" tofile="${targetdir}/latest.html"/>
+        <copy filtering="true" file="${srcdir}/pages/latest_redirect_template.html" tofile="${targetdir}/${latestfilename}"/>
     </target>
 
 
