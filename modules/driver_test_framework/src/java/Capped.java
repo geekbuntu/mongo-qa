@@ -20,7 +20,7 @@ public class Capped {
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         DBCollection coll1 = m.getCollection( "capped1" );
 
-        MyAsserts.assertEquals( 2, coll1.find().count() ); 
+        MyAsserts.assertEquals( 2, coll1.find().length() ); 
         
         DBObject sortObj = new BasicDBObject();
         sortObj.put( "$natural", 1 );
@@ -36,7 +36,7 @@ public class Capped {
             coll1.save( obj );
         }
 
-        MyAsserts.assertTrue( 15 > coll1.find().count() );
+        MyAsserts.assertTrue( 25 > coll1.find().length() );
 
         sortObj.put( "$natural", 1 );
         DBCursor cursor = coll1.find().sort( sortObj );

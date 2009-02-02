@@ -38,16 +38,21 @@ public class Remove {
         coll2.save( obj4 );
     }
 
+    // stupid hacks to get around not having count
     public static void main( String[] args ) 
         throws UnknownHostException {
 
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         DBCollection coll1 = m.getCollection( "remove1" );
 
-        MyAsserts.assertEquals( 0, coll1.find().count() ); 
+        DBCursor empty = coll1.find();
+        MyAsserts.assertEquals( false, empty.hasNext() ); 
         
-        DBCollection coll2 = m.getCollection( "remove2" );
-        MyAsserts.assertEquals( 2, coll2.find().count() ); 
+        DBCollection coll2 = m.getCollection( "remove2" ); 
+        empty = coll2.find();
+        empty.next();
+        empty.next();
+        MyAsserts.assertEquals( false, empty.hasNext() ); 
 
         DBObject obj = new BasicDBObject();
         obj.put( "b", 3 );
