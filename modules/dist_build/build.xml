@@ -28,10 +28,12 @@
     <condition property="os" value="linux">
       <os name="linux" />
     </condition>
-    <condition property="os" value="macosx">
+    <condition property="os" value="osx">
       <os name="mac os x" />
     </condition>
     
+
+    <property name="distfilename" value="mongodb-${os}-${os.arch}-${timenow}.tar.gz"/>
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
@@ -44,6 +46,7 @@
     <!--   PRIMARY TARGETS -->
 
     <target name="dist" depends="clean, init, setup, make-dist" description="Clean build and packaging of Mongo distribution"/>
+    <target name="dist-upload" depends="clean, init, setup, make-dist, upload-dist" description="Clean build and packaging of Mongo distribution, upload to s3"/>
     <target name="clean-build" depends="clean, init, setup, mongo-full-build" description="Create a fresh checkout and build of mongo and dbshell"/>
     <target name="update-build" depends="update-code, mongo-full-build" description="After a clean-build, incrementally update code and re-build all"/>
 
@@ -110,7 +113,7 @@
     </target>
 
     <target name="dist-package">
-        <tar tarfile="${targetdir}/mongo-${os}-${os.arch}-${timenow}.tar.gz" longfile="gnu" compression="gzip">
+        <tar tarfile="${targetdir}/${distfilename}" longfile="gnu" compression="gzip">
 
             <tarfileset mode="754" dir="${targetdir}">
                 <include name="mongo-dist/bin/**"/>
@@ -123,7 +126,25 @@
 
             </tar>
     </target>
-    
+
+    <target name="upload-dist" depends="gen-redirect-file" description="builds and uploads a distribution">
+
+        <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
+            <arg value="${targetdir}/${distfilename}"/>
+            <arg value="${os}"/>
+            <arg value="${distfilename}"/>
+        </exec>
+
+    </target>
+
+    <target name="gen-redirect-file">
+        <filter token="platform" value="${os}"/>
+        <filter token="distfilename" value="${distfilename}"/>
+
+        <copy filtering="true" file="${srcdir}/pages/latest_redirect_template.html" tofile="${targetdir}/latest.html"/>
+    </target>
+
+
     <!-- ======================================================
             mongo targets
       ====================================================- -->
