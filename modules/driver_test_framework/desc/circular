@@ -7,8 +7,9 @@ driver:
         1. create collections a and b
         2. save { c : b } in a
         3. save { c : 1 } in b
-        4. x = { that : 2 }
-           x.thiz = x
+        4. x_id = generate an _id value
+           x = { _id: x_id, that : 2 }
+           x.thiz = DBRef for x using x_id and namespace 'c'
            db.c.save( x )
 
 validator:
