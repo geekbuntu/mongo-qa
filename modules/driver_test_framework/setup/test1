@@ -1,4 +1,4 @@
 #!/bin/bash
 
-java Setup `basename $0`
+java Runner setup `basename $0`
 

@@ -14,7 +14,7 @@ public class Capped {
         m.getCollection( "capped2" ).drop();
     }
 
-    public static void main( String[] args ) 
+    public static void validate() 
         throws UnknownHostException {
 
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );

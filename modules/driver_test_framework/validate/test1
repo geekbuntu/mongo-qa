@@ -1,11 +1,5 @@
 #!/bin/bash
 
-if [[ $# -eq 0 ]]; then
-    out=/dev/null
-else
-    out=$1
-fi
-
-java Test1 >& $out
+java Runner validate `basename $0` $1
 
 exit $?
