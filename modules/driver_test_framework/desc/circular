@@ -9,7 +9,7 @@ driver:
         3. save { c : 1 } in b
         4. x_id = generate an _id value
            x = { _id: x_id, that : 2 }
-           x.thiz = DBRef for x
+           x.thiz = DBRef for x using x_id and namespace 'c'
            db.c.save( x )
 
 validator:
