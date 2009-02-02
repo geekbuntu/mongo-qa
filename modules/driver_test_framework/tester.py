@@ -126,10 +126,7 @@ class Summarizable:
 
     def add_to_stats( self, passed ):
         if passed:
-            print ".",
             self.passes += 1
-        else:
-            print "F",
         self.total_tests += 1
     def get_total( self ):
         return self.total_tests
@@ -229,6 +226,10 @@ class Framework (Summarizable):
         passed = self.check_results( validation_result ) and diff_result
         self.add_to_stats( passed )
         driver.add_to_stats( passed )
+        if passed:
+            print ".",
+        else:
+            print "F",
 
         # report output
         r = Renderer( out, perfect_out, report )
