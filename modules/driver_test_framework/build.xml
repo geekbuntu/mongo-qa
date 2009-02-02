@@ -2,7 +2,8 @@
 <project name="Validators" default="compile" basedir=".">
 
   <path id="classpath">
-    <pathelement path="src/build" />
+    <pathelement path="build" />
+    <pathelement path="lib/mongo.jar" />
   </path>
 
   <target name="init">
@@ -14,8 +15,9 @@
   </target>
 
   <target name="compile" depends="init">
+    <mkdir dir="build"/>
     <javac srcdir="src/java"
-           destdir="src/java/build"
+           destdir="build"
            optimize="off"
            deprecation="off"
            source="1.5"

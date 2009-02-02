@@ -93,14 +93,14 @@
 
         <!-- community drivers and tools - be dumb for now -->
 
-        <exec dir="${communitytoolsdir}" failonerror="true" executable="git">
+        <exec dir="${communitytoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/geir/mongo-java-driver.git"/>
          </exec>
 
         <exec dir="${communitytoolsdir}/mongo-java-driver" failonerror="true" executable="ant"/>
 
-        <exec dir="${communitytoolsdir}" failonerror="true" executable="git">
+        <exec dir="${communitytoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/geir/mongo-message-monitor.git"/>
          </exec>
@@ -157,14 +157,14 @@
     </target>
 
     <target name="mongo-checkout">
-        <exec dir="${workdir}" failonerror="true" executable="git">
+        <exec dir="${workdir}" failonerror="true" executable="${basedir}/loop_git.sh">
           <arg value="clone"/>
           <arg value="git://github.com/mongodb/mongo.git"/>
         </exec>
     </target>
 
     <target name="mongo-update">
-        <exec dir="${workdir}/mongo" failonerror="true" executable="git">
+        <exec dir="${workdir}/mongo" failonerror="true" executable="${basedir}/loop_git.sh">
           <arg value="pull"/>
         </exec>
     </target>
@@ -198,7 +198,7 @@
       ====================================================- -->
 
     <target name="ruby-driver-dist">
-        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
          </exec>
@@ -209,7 +209,7 @@
     </target>
 
     <target name="python-driver-dist">
-        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
          </exec>
@@ -221,7 +221,7 @@
     </target>
 
     <target name="java-driver-dist">
-        <exec dir="${supportedtoolsdir}" failonerror="true" executable="git">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
          </exec>

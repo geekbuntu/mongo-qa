@@ -4,6 +4,8 @@ import sys
 import subprocess
 from datetime import datetime
 
+os.environ["CLASSPATH"] = "build:lib/mongo.jar"
+
 ID = datetime.now().isoformat()
 
 TEST_DIR = "src"

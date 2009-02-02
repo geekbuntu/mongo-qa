@@ -6,7 +6,6 @@ else
     out=$1
 fi
 
-cd src/java/build;
 java Test1 >& $out
 
 exit $?
