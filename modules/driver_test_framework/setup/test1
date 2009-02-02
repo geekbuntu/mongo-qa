@@ -1,3 +1,4 @@
 #!/bin/bash
 
-java Setup test1
+java Setup `basename $0`
+
