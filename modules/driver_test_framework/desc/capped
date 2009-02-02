@@ -15,5 +15,6 @@ driver:
 
 validator:
         1. capped1 has 2 elements
-        2. capped1.find().sort( {$natural:1} )[0].x = 1
-        3. capped1.find().sort( {$natural:-1} )[0].x = 2
+        2. capped1.find().sort( {$natural:1} )[0].x == 1
+        3. capped1.find().sort( {$natural:-1} )[0].x == 2
+        4. capped2.find().count() == 11
