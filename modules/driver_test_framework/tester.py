@@ -43,10 +43,10 @@ class Renderer :
         self.report.write( "\tRUN BY: " + driver + "\n" )
         self.report.write( "\tDATE: " + ID + "\n\n" )
 
-    def render_diff( self, num ):
-        if num > 0:
+    def render_diff( self, diff ):
+        if diff and diff[ "exit_code" ] > 0:
             self.report.write( "FAILED DIFF\n" )
-            self.report.write( "\nNumber of incorrect output lines: " + str( num ) +"\n\n" )
+            self.report.write( "\nNumber of incorrect output lines: " + str( diff[ "exit_code" ] ) +"\n\n" )
 
     # gather reporting info at the end of the output
     def get_stats( self ):
@@ -124,8 +124,12 @@ class Summarizable:
         else:
             print "Percent passed: " + str( ( self.passes / self.total_tests ) * 100 ) + "%"
 
-    def add_to_stats( self, stats ):
-        self.passes += stats
+    def add_to_stats( self, passed ):
+        if passed:
+            print ".",
+            self.passes += 1
+        else:
+            print "F",
         self.total_tests += 1
     def get_total( self ):
         return self.total_tests
@@ -161,7 +165,7 @@ class Driver (Summarizable):
     def get_unique_path( self, test_dir, test ):
         # a unique location for this driver/test/run's files:
         #     OUTPUT_DIR/driver_name/test_ID
-        driver_dir = self.get_dir( test_dir );
+        driver_dir = self.get_dir( test_dir )
         return driver_dir + "/" + test + "_" + ID
 
 class Framework (Summarizable):
@@ -177,10 +181,10 @@ class Framework (Summarizable):
             if not driver.is_valid():
                 continue
 
-            passed = passed and self.run_all_driver( driver );
+            passed = passed and self.run_all_driver( driver )
             if len( drivers ) != 1:
                 driver.summarize( "Driver " + driver.get_name() )
-        self.summarize( "----------------------------\nAll tests" )
+        self.summarize( "\n----------------------------\nAll tests" )
         return passed
 
     # run all tests on a given driver
@@ -191,7 +195,8 @@ class Framework (Summarizable):
             prep = PREP_DIR + "/" + test
             if os.path.exists( prep ):
                 subprocess.call( [prep] )
-            passed = passed and self.run_test( driver, test )
+            p = self.run_test( driver, test )
+            passed = passed and p
         return passed
 
     # run a specific test on a given driver
@@ -202,20 +207,26 @@ class Framework (Summarizable):
         perfect_out = OUTPUT_DIR + "/" + test + ".out"
 
         # run test
-        timing_result = self.run_timed_test( driver, test, out, {} );
+        try:
+            timing_result = self.run_timed_test( driver, test, out, {} )
+        except:
+            pass
+        if not self.check_results( timing_result ):
+            self.add_to_stats( False )
+            driver.add_to_stats( False )
+            return False
 
         # diff results
-        diff_result = 0
         if os.path.exists( perfect_out ):
             if os.path.exists( out ):
-                diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) );
-            else:
-                diff_result = 1
+                diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) )
+        else:
+            diff_result = {}
 
         # validate
         validation_result = self.run_validation_test( test, {} )
 
-        passed = self.check_results( timing_result, validation_result, diff_result )
+        passed = self.check_results( validation_result ) and diff_result
         self.add_to_stats( passed )
         driver.add_to_stats( passed )
 
@@ -240,21 +251,19 @@ class Framework (Summarizable):
         return result
 
     def diff_test( self, out1, out2 ):
+        result = {}
         count = 0
         for line2 in out2:
             line1 = out1.readline()
             if line2 != line1 :
                 count += 1
-        return count
+        result[ "exit_code" ] = count
+        return result
 
-    def check_results( self, result1, result2, result3 ):
-        if result1 and "exit_code" in result1 and result1[ "exit_code" ] == 0:
-            if result2 and "exit_code" in result2 and result2[ "exit_code" ] == 0:
-                if result3 == 0:
-                    print "."
-                    return 1
-        print "F"
-        return 0
+    def check_results( self, result ):
+        if result and "exit_code" in result and result[ "exit_code" ] == 0:
+            return True
+        return False
 
 
 
@@ -271,7 +280,7 @@ for d in sys.argv[1:]:
     else:
         drivers.append( Driver( "driver" + str( driver_num ), d ) )
 
-    driver_num += 1;
+    driver_num += 1
 
 
 f = Framework()
