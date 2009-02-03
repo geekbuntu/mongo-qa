@@ -144,7 +144,7 @@
         <!-- upload the C++ docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
             <arg value="${targetdir}/mongo-dist/docs/html"/>
-            <arg value="c"/>
+            <arg value="c++"/>
         </exec>
 
         <!-- upload the python docs -->
