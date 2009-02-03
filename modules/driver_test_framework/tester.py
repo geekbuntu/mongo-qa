@@ -212,6 +212,11 @@ class Framework (Summarizable):
             timing_result = self.run_timed_test( driver, test, out, {} )
         except:
             pass
+
+        if not os.path.exists( out ):
+            print "driver " + driver.get_name() + " has not implemented " + test
+            return True
+            
         if not self.check_results( timing_result ):
             self.add_to_stats( False )
             driver.add_to_stats( False )
