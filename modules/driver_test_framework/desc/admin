@@ -1,0 +1,19 @@
+setup:
+        1. drop tester
+        2. set the profiling level to "slowOnly"
+
+driver:
+        1. add { "test" : 1 } to tester
+        2. validate tester
+        3. print true/false if it validates or not
+        4. validate system.users
+        5. print true/false if it validates or not
+        6. validate the collection called "$"
+        7. print true/false if it validates or not
+        8. print if the profiling level is "off", "slowOnly", or "all"
+        9. set the profiling level to "off"
+        10. print if the profiling level is "off", "slowOnly", or "all"
+
+validate:
+        <output matches>
+        
