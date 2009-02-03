@@ -1,0 +1,13 @@
+driver:
+        1. call db.$cmd.findOne({reseterror:1})
+        2. print lasterror == null
+        3. print preverror == null
+        4. call db.$cmd.findOne({forceerror:1})
+        5. print lasterror == null
+        6. print preverror == null
+        7. call db.foo.findOne()
+        8. print lasterror == null
+        9. print preverror == null 
+        10. print number of preverrors
+        11. call db.$cmd.findOne({reseterror:1})
+        12. print preverror == null

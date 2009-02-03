@@ -6,7 +6,7 @@ driver:
         1. add { "test" : 1 } to tester
         2. validate tester
         3. print true/false if it validates or not
-        4. validate system.users
+        4. validate pdlskwmf
         5. print true/false if it validates or not
         6. validate the collection called "$"
         7. print true/false if it validates or not
