@@ -1,0 +1,11 @@
+setup:
+        1. drop foo
+        2. db.foo.save( { x : 1 } )
+
+driver:
+        1. update { x:1 } to {x:1, y:2} in foo
+        1. update { x:2 } to {x:1, y:7} in foo
+        2. upsert { x:3 } to {x:4, y:1} in foo
+
+validate:
+        1. check that foo contains { x:1, y:2 } and { x:4, y:1 }
