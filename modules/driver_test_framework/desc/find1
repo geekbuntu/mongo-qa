@@ -1,0 +1,13 @@
+setup:
+        1. for i=5 to 15
+               db.c.save( { x : 0, y : i, z : char( i + 64 ) } )
+        1. for i=1 to 50
+               db.c.save( { x : 1, y : i, z : char( i + 64 ) } )
+        1. for i=5 to 15
+               db.c.save( { x : 2, y : i, z : char( i + 64 ) } )
+
+driver:
+        1. cursor = db.c.find( { x : 1 } ).sort( { y : 1 } ).skip( 20 ).limit( 10 );
+        2. while( cursor.hasNext() )
+               print cursor.next().z
+

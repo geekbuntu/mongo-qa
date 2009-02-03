@@ -1,0 +1,12 @@
+setup:
+        1. drop x
+        2. add { field1: "f1", field2 : "f2" } to x
+        3. create an index on field1
+        4. create an index on field2
+
+driver:
+        1. drop the index on field1 in collection x
+        2. print indices on x
+        3. add an index on fields a, b, and c in collection y
+        4. add an index on field d in collection y
+        5. print the indices for collection y in alphabetical order
