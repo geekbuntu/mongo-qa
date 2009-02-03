@@ -1,0 +1,16 @@
+setup:
+        1. drop collection dbs_1
+        2. drop collection dbs_2
+        3. drop collection dbs_3
+
+driver:
+        1. Save { foo : "bar" } to the collection dbs_1 
+        2. Save { psi : "phi" } to the collection dbs_2
+        3. print the name of this database
+        4. print a list of collections in this database starting with "dbs" in alphabetical order
+        5. drop the collection dbs_1
+        6. explicitly create a collection called dbs_3
+        7. print a list of collections in this database starting with "dbs" in alphabetical order
+
+validate:
+        1. check that dbs_2 and dbs_3 exist

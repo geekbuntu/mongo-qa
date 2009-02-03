@@ -1,5 +1,5 @@
 #!/bin/bash
 
-java Runner validate `basename $0` $1
+java Runner validate `basename $0` 
 
 exit $?
