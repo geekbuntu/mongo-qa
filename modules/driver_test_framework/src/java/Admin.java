@@ -10,7 +10,10 @@ public class Admin {
         throws UnknownHostException {
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         m.getCollection( "tester" ).drop();
-        // TODO: admin
+
+        DBObject foo = new BasicDBObject();
+        foo.put( "profile", 1 );
+        m.getCollection( "$cmd" ).findOne( foo );
     }
 
     public static void validate() {
