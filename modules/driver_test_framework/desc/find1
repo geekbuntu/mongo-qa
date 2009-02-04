@@ -1,9 +1,10 @@
 setup:
-        1. for i=5 to 15
+        1. drop c
+        2. for i=5 to 15
                db.c.save( { x : 0, y : i, z : char( i + 64 ) } )
-        1. for i=1 to 50
+        3. for i=1 to 50
                db.c.save( { x : 1, y : i, z : char( i + 64 ) } )
-        1. for i=5 to 15
+        4. for i=5 to 15
                db.c.save( { x : 2, y : i, z : char( i + 64 ) } )
 
 driver:
@@ -11,3 +12,14 @@ driver:
         2. while( cursor.hasNext() )
                print cursor.next().z
 
+expected output:
+U
+V
+W
+X
+Y
+Z
+[
+\
+]
+^
