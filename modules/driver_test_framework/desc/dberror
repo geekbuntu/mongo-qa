@@ -11,3 +11,13 @@ driver:
         10. print number of preverrors
         11. call db.$cmd.findOne({reseterror:1})
         12. print preverror == null
+
+expected output:
+true
+true
+false
+false
+true
+false
+2
+true

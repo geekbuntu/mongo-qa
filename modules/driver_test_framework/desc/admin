@@ -14,6 +14,9 @@ driver:
         9. set the profiling level to "off"
         10. print if the profiling level is "off", "slowOnly", or "all"
 
-validate:
-        <output matches>
-        
+expected output:
+true
+false
+false
+slowOnly
+off

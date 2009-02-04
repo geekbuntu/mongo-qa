@@ -13,5 +13,10 @@ driver:
         4. print test3.find({ i : 3 }).count()
         5. print test3.find({ i : { $gte : 67 } }).count()
 
-validator:
-        1. output matches expected output
+
+expected output:
+0
+1
+0
+1
+33

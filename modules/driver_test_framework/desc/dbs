@@ -14,3 +14,10 @@ driver:
 
 validate:
         1. check that dbs_2 and dbs_3 exist
+
+expected output:
+driver_test_framework
+dbs_1
+dbs_2
+dbs_2
+dbs_3
