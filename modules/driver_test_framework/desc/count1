@@ -1,9 +1,10 @@
 setup:
         1. drop test1
-        2. drop test2
-        3. test2.save({ name  : "a" })
-        4. drop test3
-        5. for j=0 to 99
+        2. create test1 as an empty collection
+        3. drop test2
+        4. test2.save({ name  : "a" })
+        5. drop test3
+        6. for j=0 to 99
                test3.save( { i : j, foo : "bar" } )
 
 driver:
