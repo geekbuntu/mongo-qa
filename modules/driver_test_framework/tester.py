@@ -251,7 +251,10 @@ class Framework (Summarizable):
         output = os.path.abspath(output)
         os.chdir(os.path.dirname(driver.get_path()))
         result[ "begin" ] = datetime.now()
-        result[ "exit_code" ] = subprocess.call( [self.test_dir + driver.get_path(), test, output] )
+        try:
+            result[ "exit_code" ] = subprocess.call( [self.test_dir + driver.get_path(), test, output] )
+        except:
+            result[ "exit_code" ] = -1
         result[ "end" ] = datetime.now()
         os.chdir(old_path)
         return result
