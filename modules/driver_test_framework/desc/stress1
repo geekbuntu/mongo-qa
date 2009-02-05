@@ -1,19 +1,19 @@
-setup: 
+setup:
         1. drop stress1
 
 driver:
         1. for i=0 to 50000
                db.stress1.save( { name : "asdf" + i, date : new Date(), id: i,
-                                  blah : "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" + 
-                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" + 
-                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" + 
-                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" + 
-                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" + 
+                                  blah : "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" +
+                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" +
+                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" +
+                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" +
+                                         "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas" +
                                          "lksjhasoh1298alshasoidiohaskjasiouashoasasiugoas",
                                   subarray : [] } )
         2. for i=0 to 10000
-               x = db.findOne( { id : i } );
-               x.subarray = "foo" + count++;
+               x = db.stress1.findOne( { id : i } );
+               x.subarray = "foo" + i;
                db.stress1.save( x );
 
 validate:
