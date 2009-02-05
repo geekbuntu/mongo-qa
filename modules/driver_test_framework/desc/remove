@@ -1,6 +1,8 @@
 setup:
-        1. add 50 elements to remove1
-        2. add to remove2:
+        1. drop collection remove1
+        2. drop collection remove2
+        3. add 50 elements to remove1
+        4. add to remove2:
            { a : 3, b : 1 }
            { a : 3, b : 3 } 
            { a : 2, b : 3 }
