@@ -15,9 +15,7 @@ public class Stress1 {
     public static void validate() 
         throws UnknownHostException {
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
-        DBObject obj = new BasicDBObject();
-        obj.put("date", 1 );
-        DBCursor cursor = m.getCollection( "stress1" ).find().sort( obj );
+        DBCursor cursor = m.getCollection( "stress1" ).find();
 
         for( int i=0; i<50000; i++) {
             assert cursor.hasNext();
