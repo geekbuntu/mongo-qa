@@ -12,9 +12,16 @@ public class Count1 {
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
         m.getCollection( "test1" ).drop();
 
-        DBCollection foo = m.getCollection( "test2" );
-        foo.drop();
+        // Make sure test1 exists and is empty
+        DBCollection foo = m.getCollection( "test1" );
         DBObject obj = new BasicDBObject();
+        obj.put( "junk", "bonds" );
+        foo.save( obj );
+        foo.remove( obj );
+
+        foo = m.getCollection( "test2" );
+        foo.drop();
+        obj = new BasicDBObject();
         obj.put( "name", "a" );
         foo.save( obj );
 
