@@ -12,6 +12,6 @@ driver:
         5. print the indices for collection y in alphabetical order
 
 expected output:
-field2
-a_b_c
-d
+field2_1
+a_1_b_1_c_1
+d_1
