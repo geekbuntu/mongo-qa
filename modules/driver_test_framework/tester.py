@@ -1,6 +1,7 @@
 
 import os
 import sys
+import filecmp
 import subprocess
 from datetime import datetime
 
@@ -12,6 +13,10 @@ TEST_DIR = "src"
 PREP_DIR = "setup"
 VALIDATION_DIR = "validate"
 OUTPUT_DIR = "output"
+
+GRIDFS_PATH = "output/gridfs"
+GRIDFS_FILE = "input"
+
 TEMP_FILE = os.getcwd() + "/temp_" + ID
 
 class Renderer :
@@ -176,13 +181,15 @@ class Framework (Summarizable):
     def run_all( self, drivers ):
         passed = True
         for driver in drivers:
-            if not driver.is_valid():
-                continue
+             if not driver.is_valid():
+                 continue
 
-            passed = passed and self.run_all_driver( driver )
-            if len( drivers ) != 1:
-                driver.summarize( "Driver " + driver.get_name() )
+             passed = passed and self.run_all_driver( driver )
+             if len( drivers ) != 1:
+                 driver.summarize( "Driver " + driver.get_name() )
         self.summarize( "\n----------------------------\nAll tests" )
+        grid_fs = GridFS( drivers );
+        passed = grid_fs.run_all();
         return passed
 
     # run all tests on a given driver
@@ -290,6 +297,56 @@ class Framework (Summarizable):
         if result and "exit_code" in result and result[ "exit_code" ] == 0:
             return True
         return False
+
+class GridFS:
+    def __init__( self, drivers ):
+        self.test_dir = os.getcwd() + "/"
+        self.drivers = drivers
+
+    def run_all( self ):
+        passed = True
+        for in_d in self.drivers:
+            for out_d in self.drivers:
+                if in_d == out_d:
+                    continue
+                
+                infile = GRIDFS_PATH + "/" + GRIDFS_FILE
+                outfile = GRIDFS_PATH + "/" + in_d.get_name() + "_to_" + out_d.get_name()
+
+                # actual test
+                self.file_to_db( in_d )
+                self.file_from_db( out_d, outfile )
+                
+                if not os.path.exists( outfile ):
+                    print out_d.get_name() + " has not implemented gridfs test, yet"
+                    continue
+
+                p = filecmp.cmp( infile, outfile );
+                if not p:
+                    print "ERROR! " + in_d.get_name() + " => " + out_d.get_name()
+                    print "INPUT: " + infile + " (saved to db by " + in_d.get_name() + ")"
+                    os.system( "cat " + infile )
+                    print "OUTPUT: " + outfile + " (read from db by " + out_d.get_name() + ")"
+                    os.system( "cat " + outfile )
+                passed = p and passed
+
+        return passed
+
+    def file_to_db( self, driver ):
+        try:
+            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_to_db"] )
+        except:
+            print driver.get_name() + " threw an error writing a file to the db"
+            return 1
+        return result
+
+    def file_from_db( self, driver, outfile ):
+        try:
+            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_from_db", outfile] )
+        except:
+            print driver.get_name() + " threw an error reading a file from the db"
+            return 1
+        return result
 
 
 
