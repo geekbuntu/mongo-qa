@@ -169,6 +169,7 @@ class Framework (Summarizable):
     def __init__( self ):
         self.test_dir = os.getcwd() + "/"
         self.tests = os.listdir( VALIDATION_DIR )
+        self.current_test = ""
         Summarizable.__init__( self )
 
     # run all tests on all drivers
@@ -188,6 +189,7 @@ class Framework (Summarizable):
     def run_all_driver( self, driver ):
         passed = True
         for test in self.tests:
+            self.current_test = test
             # if there is a pre-test file to run, do so
             prep = PREP_DIR + "/" + test
             if os.path.exists( prep ):
@@ -226,7 +228,7 @@ class Framework (Summarizable):
         # diff results
         if os.path.exists( perfect_out ):
             if os.path.exists( out ):
-                diff_result = self.diff_test( open( out, "r" ), open( perfect_out, "r" ) )
+                diff_result = self.diff_test( out, perfect_out )
         else:
             diff_result = { "exit_code" : 0 }
         if not self.check_results( diff_result ):
@@ -264,14 +266,24 @@ class Framework (Summarizable):
         result[ "exit_code" ] = subprocess.call( [ validate_script, TEMP_FILE ] )
         return result
 
-    def diff_test( self, out1, out2 ):
+    def diff_test( self, out1_str, out2_str ):
+        out1 = open( out1_str, "r" ); 
+        out2 = open( out2_str, "r" )
         result = {}
         count = 0
+        wanted = ""
+        got = ""
         for line2 in out2:
             line1 = out1.readline()
+            wanted += line2
+            got += line1
             if line2 != line1 :
                 count += 1
         result[ "exit_code" ] = count
+        if count > 0:
+            print "\n" + self.current_test + " FAILED DIFF: "
+            print "Wanted: \n" + wanted
+            print "Got: \n" + got
         return result
 
     def check_results( self, result ):
