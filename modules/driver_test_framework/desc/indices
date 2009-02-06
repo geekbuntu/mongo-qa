@@ -3,6 +3,7 @@ setup:
         2. add { field1: "f1", field2 : "f2" } to x
         3. create an index on field1
         4. create an index on field2
+        5. drop y
 
 driver:
         1. drop the index on field1 in collection x

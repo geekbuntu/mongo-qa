@@ -10,7 +10,12 @@ public class Indices {
         throws UnknownHostException {
 
         Mongo m = new Mongo( new DBAddress( "127.0.0.1:27017/driver_test_framework" ) );
-        DBCollection c = m.getCollection( "x" );
+        DBCollection c = m.getCollection( "y" );
+        c.dropIndexes();
+        c.drop();
+
+        c = m.getCollection( "x" );
+        c.dropIndexes();
         c.drop();
 
         DBObject obj = new BasicDBObject();
