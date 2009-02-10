@@ -308,9 +308,6 @@ class GridFS:
         passed = True
         for in_d in self.drivers:
             for out_d in self.drivers:
-                if in_d == out_d:
-                    continue
-                
                 infile = GRIDFS_PATH + "/" + GRIDFS_FILE
                 outfile = GRIDFS_PATH + "/" + in_d.get_name() + "_to_" + out_d.get_name()
 
