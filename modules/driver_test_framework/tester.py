@@ -216,6 +216,7 @@ class Framework (Summarizable):
         report = driver.get_unique_path( OUTPUT_DIR, test ) + ".report"
         perfect_out = OUTPUT_DIR + "/" + test + ".out"
 
+        print "\nRunning "+test+" on " + driver.get_name() + " at "+str( datetime.now() );
         # run test
         try:
             timing_result = self.run_timed_test( driver, test, out, {} )
