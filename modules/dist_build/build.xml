@@ -42,7 +42,7 @@
     </condition>
     
     <property name="distfilename" value="mongodb-${os}-${os-arch}-${timenow}.tar.gz"/>
-    <property name="latestfilename" value="latest-${os-arch}.html"/>
+    <property name="latestfilename" value="latest-${os-arch}.tgz"/>
 
     <target name="clean">
         <delete failonerror="false" dir="${workdir}"/>
