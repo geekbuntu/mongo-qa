@@ -203,30 +203,30 @@
         <antcall target="mongo-docs-generate"/>
 
         <copy todir="${doc-source-dir}/docs">
-            <fileset dir="${workdir}/mongo/docs"/>
+            <fileset dir="${targetdir}/${workdir}/mongo/docs"/>
         </copy>
 
         <!-- upload the C++ docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${doc-source-dir}/docs/html"/>
+            <arg value="${targetdir}/${doc-source-dir}/docs/html"/>
             <arg value="c++"/>
         </exec>
 
         <!-- upload the python docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${doc-source-dir}/drivers_and_tools/mongo-python-driver/doc"/>
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-python-driver/doc"/>
             <arg value="python"/>
         </exec>
 
         <!-- upload the ruby docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${doc-source-dir}/drivers_and_tools/mongo-ruby-driver/html"/>
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-ruby-driver/html"/>
             <arg value="ruby"/>
         </exec>
 
         <!-- upload the java docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${doc-source-dir}/drivers_and_tools/mongo-java-driver/docs"/>
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-java-driver/docs"/>
             <arg value="java"/>
         </exec>
 
