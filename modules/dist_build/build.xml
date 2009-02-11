@@ -202,8 +202,8 @@
         <!-- we have to generate C docs since doxygen is flakey on linux atm -->
         <antcall target="mongo-docs-generate"/>
 
-        <copy todir="${doc-source-dir}/docs">
-            <fileset dir="${targetdir}/${workdir}/mongo/docs"/>
+        <copy todir="${targetdir}/${doc-source-dir}/docs">
+            <fileset dir="${workdir}/mongo/docs"/>
         </copy>
 
         <!-- upload the C++ docs -->
