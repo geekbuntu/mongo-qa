@@ -193,7 +193,7 @@
 
         <exec dir="${targetdir}" executable="grep" inputstring="${redirect-grep}" outputproperty="doc-source-dir">
             <arg value="-v"/>
-            <arg value="tar"/>
+            <arg value="tgz"/>
         </exec>
 
         <echo message="Getting docs from : ${doc-source-dir}"/>
