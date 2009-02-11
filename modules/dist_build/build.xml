@@ -6,6 +6,7 @@
       <format property="timenow" pattern="yyyyMMddHHmm" />
     </tstamp>
 
+    <property name="releaseversionfile" value="latest"/>    
     <property name="releaseversion" value="${timenow}"/>
     <echo message="Release Version : ${releaseversion}"/>
 
@@ -56,7 +57,8 @@
     <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/"/>
     <property name="communitytoolsdir" value="${distdir}/drivers_and_tools/community"/>
     
-    <property name="distfilename" value="mongodb-${os}-${os-arch}-${releaseversion}.tar.gz"/>
+    <property name="distfilename" value="mongodb-${os}-${os-arch}-${releaseversionfile}.tar.gz"/>
+    <property name="distlightfilename" value="mongodb-dbonly-${os}-${os-arch}-${releaseversionfile}.tar.gz"/>
     <property name="latestfilename" value="latest-${os-arch}.tgz"/>
 
     <target name="clean">
@@ -69,9 +71,11 @@
 
     <!--   PRIMARY TARGETS -->
 
-    <target name="dist" depends="clean, init, setup, make-dist" description="Clean build and packaging of Mongo distribution"/>
-    <target name="dist-upload" depends="clean, init, setup, make-dist, upload-dist" description="Clean build and packaging of Mongo distribution, upload to s3"/>
-    <target name="clean-build" depends="clean, init, setup, mongo-full-build" description="Create a fresh checkout and build of mongo and dbshell"/>
+    <target name="dist" depends="clean, init, setup, make-dist" description="Clean build and packaging of full Mongo distribution"/>
+    <target name="dist-light" depends="clean, init, setup, make-dist-light" description="Clean build and packaging of full Mongo distribution"/>
+    <target name="dist-upload" depends="dist, upload-dist" description="Clean build and packaging of full Mongo distribution, upload to s3"/>
+    <target name="dist-light-upload" depends="dist-light, upload-dist-light" description="Clean build and packaging of full Mongo distribution, upload to s3"/>
+     <target name="clean-build" depends="clean, init, setup, mongo-full-build" description="Create a fresh checkout and build of mongo and dbshell"/>
     <target name="update-build" depends="update-code, mongo-full-build" description="After a clean-build, incrementally update code and re-build all"/>
 
     <!--   SEOONDARY TARGETS -->
@@ -83,7 +87,8 @@
             packaging targets
       ====================================================- -->
 
-    <target name="make-dist" depends="dist-setup, dist-package"/>
+    <target name="make-dist" depends="dist-setup, dist-extra, mongo-hash, extra-hashes, dist-package"/>
+    <target name="make-dist-light" depends="dist-setup, mongo-hash, dist-package-light"/>
 
     <target name="dist-setup">
 
@@ -108,6 +113,10 @@
                 <exclude name="DRIVERS_AND_TOOLS_INFO"/>
             </fileset>
         </copy>
+
+    </target>
+
+    <target name="dist-extra">
 
         <copy todir="${distdir}/drivers_and_tools/" file="${srcdir}/resources/DRIVERS_AND_TOOLS_INFO"/>
 
@@ -143,12 +152,25 @@
         <delete>
            <fileset dir="${communitytoolsdir}/mongo-message-monitor/lib/" includes="testng*.jar"/>
         </delete>
-
-        <antcall target="hashes"/>
     </target>
 
     <target name="dist-package">
         <tar tarfile="${targetdir}/${distfilename}" longfile="gnu" compression="gzip">
+
+            <tarfileset mode="754" dir="${targetdir}">
+                <include name="${releasedir}/bin/**"/>
+            </tarfileset>
+
+            <tarfileset  dir="${targetdir}">
+                <include name="${releasedir}/**"/>
+                <exclude name="${releasedir}/bin/**"/>
+            </tarfileset>
+
+            </tar>
+    </target>
+
+    <target name="dist-package-light">
+        <tar tarfile="${targetdir}/${distlightfilename}" longfile="gnu" compression="gzip">
 
             <tarfileset mode="754" dir="${targetdir}">
                 <include name="${releasedir}/bin/**"/>
@@ -193,24 +215,25 @@
 
     </target>
 
-    <target name="upload-dist" depends="gen-redirect-file" >
+    <target name="upload-dist" >
 
         <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
             <arg value="${targetdir}/${distfilename}"/>
             <arg value="${os}"/>
-            <arg value="${latestfilename}"/>
             <arg value="${distfilename}"/>
         </exec>
 
     </target>
 
-    <target name="gen-redirect-file">
-        <filter token="platform" value="${os}"/>
-        <filter token="distfilename" value="${distfilename}"/>
+    <target name="upload-dist-light" >
 
-        <copy filtering="true" file="${srcdir}/pages/latest_redirect_template.html" tofile="${targetdir}/${latestfilename}"/>
+        <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
+            <arg value="${targetdir}/${distlightfilename}"/>
+            <arg value="${os}"/>
+            <arg value="${distlightfilename}"/>
+        </exec>
+
     </target>
-
 
     <!-- ======================================================
             mongo targets
@@ -351,7 +374,7 @@
     </target>
 
 
-    <target name="hashes" unless="windows">
+    <target name="mongo-hash" unless="windows">
 
         <exec dir="${workdir}/mongo" executable="git">
             <arg value="log"/>
@@ -360,9 +383,13 @@
         <exec executable="awk">
             <arg value='NR&lt;2 {print $2 " (mongo)"}'/>
             <redirector inputstring="${redirect1.git}">
-                <outputmapper type="merge" to="${targetdir}/${releasedir}/git.hashes"/>
+                <outputmapper type="merge" to="${targetdir}/${releasedir}/mongo.hash"/>
             </redirector>
         </exec>
+
+    </target>
+
+    <target name="extra-hashes" unless="windows">
 
         <exec dir="${supportedtoolsdir}/mongo-java-driver" executable="git">
             <arg value="log"/>
@@ -370,7 +397,7 @@
         </exec>
         <exec executable="awk">
             <arg value='NR&lt;2 {print $2 " (java driver)"}'/>
-            <redirector append="yes" inputstring="${redirect2.git}">
+            <redirector inputstring="${redirect2.git}">
                 <outputmapper type="merge" to="${targetdir}/${releasedir}/git.hashes"/>
             </redirector>
         </exec>
