@@ -10,7 +10,7 @@
     <property name="bindir" value="${distdir}/bin"/>
     <property name="libdir" value="${distdir}/lib"/>
     <property name="jarsdir" value="${distdir}/jars"/>
-    <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/supported"/>
+    <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/"/>
     <property name="communitytoolsdir" value="${distdir}/drivers_and_tools/community"/>
 
     <!-- build time -->
@@ -112,12 +112,22 @@
 
         <exec dir="${communitytoolsdir}/mongo-java-driver" failonerror="true" executable="ant"/>
 
+        <!-- remove the build artifacts (.class files) and the testng jar -->
+        <delete dir="${communitytoolsdir}/mongo-java-driver/target"/>
+        <delete dir="${communitytoolsdir}/mongo-java-driver/lib"/>
+
+
         <exec dir="${communitytoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/geir/mongo-message-monitor.git"/>
          </exec>
 
         <exec dir="${communitytoolsdir}/mongo-message-monitor" failonerror="true" executable="ant"/>
+
+        <delete dir="${communitytoolsdir}/mongo-message-monitor/target"/>
+        <delete>
+           <fileset dir="${communitytoolsdir}/mongo-message-monitor/lib/" includes="testng*.jar"/>
+        </delete> --p
 
     </target>
 
@@ -149,19 +159,19 @@
 
         <!-- upload the python docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-python-driver/doc"/>
+            <arg value="${targetdir}/mongo-dist/drivers_and_tools/mongo-python-driver/doc"/>
             <arg value="python"/>
         </exec>
 
         <!-- upload the ruby docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-ruby-driver/html"/>
+            <arg value="${targetdir}/mongo-dist/drivers_and_tools/mongo-ruby-driver/html"/>
             <arg value="ruby"/>
         </exec>
 
         <!-- upload the java docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-java-driver/docs"/>
+            <arg value="${targetdir}/mongo-dist/drivers_and_tools/mongo-java-driver/docs"/>
             <arg value="java"/>
         </exec>
 
@@ -298,7 +308,7 @@
 
         <!-- remove the build artifacts (.class files) and the testng jar -->
         <delete dir="${supportedtoolsdir}/mongo-java-driver/build"/>
-        <delete dir="${supportedtoolsdir}/mongo-java-driver/include"/>        
+        <delete dir="${supportedtoolsdir}/mongo-java-driver/lib"/>
     </target>
 
 </project>
