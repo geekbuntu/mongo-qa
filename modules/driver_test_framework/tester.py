@@ -4,6 +4,7 @@ import sys
 import filecmp
 import subprocess
 from datetime import datetime
+from pymongo.connection import Connection
 
 os.environ["CLASSPATH"] = "build:lib/mongo.jar"
 
@@ -187,9 +188,9 @@ class Framework (Summarizable):
              passed = passed and self.run_all_driver( driver )
              if len( drivers ) != 1:
                  driver.summarize( "Driver " + driver.get_name() )
-        self.summarize( "\n----------------------------\nAll tests" )
         grid_fs = GridFS( drivers );
-        passed = grid_fs.run_all();
+        passed = passed and grid_fs.run_all();
+        self.summarize( "\n----------------------------\nAll tests" )
         return passed
 
     # run all tests on a given driver
@@ -306,46 +307,57 @@ class GridFS:
 
     def run_all( self ):
         passed = True
+        print "GridFS tests"
         for in_d in self.drivers:
             for out_d in self.drivers:
+                print in_d.get_name() + " => " + out_d.get_name()
                 infile = GRIDFS_PATH + "/" + GRIDFS_FILE
                 outfile = GRIDFS_PATH + "/" + in_d.get_name() + "_to_" + out_d.get_name()
 
                 # actual test
-                self.file_to_db( in_d )
-                self.file_from_db( out_d, outfile )
+                self.file_to_db( in_d, infile )
+                self.file_from_db( out_d, infile, outfile )
                 
                 if not os.path.exists( outfile ):
                     print out_d.get_name() + " has not implemented gridfs test, yet"
                     continue
 
-                p = filecmp.cmp( infile, outfile );
-                if not p:
+                p = os.system( "diff " + infile + " " + outfile );
+                if p != 0:
                     print "ERROR! " + in_d.get_name() + " => " + out_d.get_name()
                     print "INPUT: " + infile + " (saved to db by " + in_d.get_name() + ")"
                     os.system( "cat " + infile )
                     print "OUTPUT: " + outfile + " (read from db by " + out_d.get_name() + ")"
-                    os.system( "cat " + outfile )
-                passed = p and passed
+                    #os.system( "cat " + outfile )
+                passed = p == 0 and passed
+                self.remove_files()
 
         return passed
 
-    def file_to_db( self, driver ):
+    def file_to_db( self, driver, infile ):
         try:
-            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_to_db"] )
+            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_in", infile] )
         except:
             print driver.get_name() + " threw an error writing a file to the db"
             return 1
         return result
 
-    def file_from_db( self, driver, outfile ):
+    def file_from_db( self, driver, infile, outfile ):
         try:
-            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_from_db", outfile] )
+            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_out", infile, outfile] )
         except:
             print driver.get_name() + " threw an error reading a file from the db"
             return 1
         return result
 
+    def remove_files(self):
+        connection = Connection()
+        db = connection["driver_test_framework"]
+        files = db["fs.files"]
+        chunks = db["fs.chunks"]
+        dict = {}
+        files.remove(dict);
+        chunks.remove(dict);
 
 
 if len( sys.argv ) < 2:
