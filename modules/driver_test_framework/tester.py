@@ -4,7 +4,7 @@ import sys
 import filecmp
 import subprocess
 from datetime import datetime
-from pymongo.connection import Connection
+#from pymongo.connection import Connection
 
 os.environ["CLASSPATH"] = "build:lib/mongo.jar"
 
@@ -351,13 +351,14 @@ class GridFS:
         return result
 
     def remove_files(self):
-        connection = Connection()
+        """connection = Connection()
         db = connection["driver_test_framework"]
         files = db["fs.files"]
         chunks = db["fs.chunks"]
         dict = {}
         files.remove(dict);
-        chunks.remove(dict);
+        chunks.remove(dict);"""
+        pass
 
 
 if len( sys.argv ) < 2:
