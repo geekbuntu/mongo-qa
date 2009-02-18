@@ -227,7 +227,7 @@ class Framework (Summarizable):
         if not os.path.exists( out ):
             print "driver " + driver.get_name() + " has not implemented " + test
             return True
-            
+
         if not self.check_results( timing_result ):
             self.add_to_stats( False )
             driver.add_to_stats( False )
@@ -276,7 +276,7 @@ class Framework (Summarizable):
         return result
 
     def diff_test( self, out1_str, out2_str ):
-        out1 = open( out1_str, "r" ); 
+        out1 = open( out1_str, "r" );
         out2 = open( out2_str, "r" )
         result = {}
         count = 0
@@ -317,7 +317,7 @@ class GridFS:
                 # actual test
                 self.file_to_db( in_d, infile )
                 self.file_from_db( out_d, infile, outfile )
-                
+
                 if not os.path.exists( outfile ):
                     print out_d.get_name() + " has not implemented gridfs test, yet"
                     continue
@@ -340,7 +340,7 @@ class GridFS:
             infile = os.path.abspath(infile)
             timed = os.path.abspath(driver.get_unique_path( OUTPUT_DIR, "gridfs_in" ) + ".out")
             os.chdir(os.path.dirname(driver.get_path()))
-            result = subprocess.call( [self.test_dir + driver.get_path(), timed, "gridfs_in", infile] )
+            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_in", timed, infile] )
         except:
             print driver.get_name() + " threw an error writing a file to the db"
             return 1
