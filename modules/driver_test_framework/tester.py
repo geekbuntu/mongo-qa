@@ -335,19 +335,30 @@ class GridFS:
         return passed
 
     def file_to_db( self, driver, infile ):
+        old_path = os.getcwd()
         try:
-            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_in", infile] )
+            infile = os.path.abspath(infile)
+            timed = os.path.abspath(driver.get_unique_path( OUTPUT_DIR, "gridfs_in" ) + ".out")
+            os.chdir(os.path.dirname(driver.get_path()))
+            result = subprocess.call( [self.test_dir + driver.get_path(), timed, "gridfs_in", infile] )
         except:
             print driver.get_name() + " threw an error writing a file to the db"
             return 1
+        os.chdir(old_path)
         return result
 
     def file_from_db( self, driver, infile, outfile ):
+        old_path = os.getcwd()
         try:
-            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_out", infile, outfile] )
+            infile = os.path.abspath(infile)
+            outfile = os.path.abspath(outfile)
+            timed = os.path.abspath(driver.get_unique_path( OUTPUT_DIR, "gridfs_out" ) + ".out")
+            os.chdir(os.path.dirname(driver.get_path()))
+            result = subprocess.call( [self.test_dir + driver.get_path(), "gridfs_out", timed, infile, outfile] )
         except:
             print driver.get_name() + " threw an error reading a file from the db"
             return 1
+        os.chdir(old_path)
         return result
 
     def remove_files(self):

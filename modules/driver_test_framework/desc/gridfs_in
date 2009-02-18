@@ -2,4 +2,4 @@ setup:
         1. Remove files from db
 
 driver:
-        1. Save the file (the filename is the second argument) to the db in the fs.files collection
+        1. Save the file (the filename is the third argument) to the db in the fs.files collection
