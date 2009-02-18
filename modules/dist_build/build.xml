@@ -1,22 +1,26 @@
 <?xml version="1.0"?>
 <project name="stand-alone-release" default="update-build" basedir=".">
 
-    <property name="workdir" value="workdir"/>
-
-    <property name="srcdir" value="src"/>
-
-    <property name="targetdir" value="target"/>
-    <property name="distdir" value="${targetdir}/mongo-dist"/>
-    <property name="bindir" value="${distdir}/bin"/>
-    <property name="libdir" value="${distdir}/lib"/>
-    <property name="jarsdir" value="${distdir}/jars"/>
-    <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/supported"/>
-    <property name="communitytoolsdir" value="${distdir}/drivers_and_tools/community"/>
-
     <!-- build time -->
     <tstamp>
       <format property="timenow" pattern="yyyyMMddHHmm" />
     </tstamp>
+
+    <property name="releaseversionfile" value="latest"/>    
+    <property name="releaseversion" value="${timenow}"/>
+    <echo message="Release Version : ${releaseversion}"/>
+
+    <property name="mongodb-version" value="master"/>
+    <echo message="MongoDB Version : ${mongodb-version}"/>
+
+    <property name="java-driver-version" value="master"/>
+    <echo message="Java Driver Version : ${java-driver-version}"/>
+
+    <property name="python-driver-version" value="master"/>
+    <echo message="Python Driver Version : ${python-driver-version}"/>
+
+    <property name="ruby-driver-version" value="master"/>
+    <echo message="Ruby Driver version : ${ruby-driver-version}"/>
 
     <!-- this special case makes sense -->
     <condition property="os" value="windows">
@@ -40,8 +44,20 @@
     <condition property="os-arch" value="i386">
        <os arch="i386"/>
     </condition>
+
+    <property name="workdir" value="workdir"/>
+    <property name="srcdir" value="src"/>
+
+    <property name="targetdir" value="target"/>
+    <property name="releasedir" value="mongodb-full-${os}-${os-arch}-${releaseversion}"/>
+    <property name="distdir" value="${targetdir}/${releasedir}"/>
+    <property name="bindir" value="${distdir}/bin"/>
+    <property name="libdir" value="${distdir}/lib"/>
+    <property name="jarsdir" value="${distdir}/jars"/>
+    <property name="supportedtoolsdir" value="${distdir}/drivers_and_tools/"/>
+    <property name="communitytoolsdir" value="${distdir}/drivers_and_tools/community"/>
     
-    <property name="distfilename" value="mongodb-${os}-${os-arch}-${timenow}.tar.gz"/>
+    <property name="distfilename" value="mongodb-full-${os}-${os-arch}-${releaseversionfile}.tgz"/>
     <property name="latestfilename" value="latest-${os-arch}.tgz"/>
 
     <target name="clean">
@@ -54,9 +70,11 @@
 
     <!--   PRIMARY TARGETS -->
 
-    <target name="dist" depends="clean, init, setup, make-dist" description="Clean build and packaging of Mongo distribution"/>
-    <target name="dist-upload" depends="clean, init, setup, make-dist, upload-dist" description="Clean build and packaging of Mongo distribution, upload to s3"/>
-    <target name="clean-build" depends="clean, init, setup, mongo-full-build" description="Create a fresh checkout and build of mongo and dbshell"/>
+    <target name="dist" depends="clean, init, setup, make-dist" description="Clean build and packaging of full Mongo distribution"/>
+    <target name="dist-light" depends="clean, init, setup, make-dist-light" description="Clean build and packaging of full Mongo distribution"/>
+    <target name="dist-upload" depends="dist, upload-dist" description="Clean build and packaging of full Mongo distribution, upload to s3"/>
+    <target name="dist-light-upload" depends="dist-light, upload-dist-light" description="Clean build and packaging of full Mongo distribution, upload to s3"/>
+     <target name="clean-build" depends="clean, init, setup, mongo-full-build" description="Create a fresh checkout and build of mongo and dbshell"/>
     <target name="update-build" depends="update-code, mongo-full-build" description="After a clean-build, incrementally update code and re-build all"/>
 
     <!--   SEOONDARY TARGETS -->
@@ -68,7 +86,8 @@
             packaging targets
       ====================================================- -->
 
-    <target name="make-dist" depends="dist-setup, dist-package"/>
+    <target name="make-dist" depends="dist-setup, dist-extra, mongo-hash, extra-hashes, dist-package"/>
+    <target name="make-dist-light" depends="dist-setup, mongo-hash, dist-package-light"/>
 
     <target name="dist-setup">
 
@@ -94,6 +113,10 @@
             </fileset>
         </copy>
 
+    </target>
+
+    <target name="dist-extra">
+
         <copy todir="${distdir}/drivers_and_tools/" file="${srcdir}/resources/DRIVERS_AND_TOOLS_INFO"/>
 
         <!-- supported drivers and tools - be dumb for now -->
@@ -112,6 +135,11 @@
 
         <exec dir="${communitytoolsdir}/mongo-java-driver" failonerror="true" executable="ant"/>
 
+        <!-- remove the build artifacts (.class files) and the testng jar -->
+        <delete dir="${communitytoolsdir}/mongo-java-driver/target"/>
+        <delete dir="${communitytoolsdir}/mongo-java-driver/lib"/>
+
+
         <exec dir="${communitytoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
            <arg value="clone"/>
            <arg value="git://github.com/geir/mongo-message-monitor.git"/>
@@ -119,18 +147,37 @@
 
         <exec dir="${communitytoolsdir}/mongo-message-monitor" failonerror="true" executable="ant"/>
 
+        <delete dir="${communitytoolsdir}/mongo-message-monitor/target"/>
+        <delete>
+           <fileset dir="${communitytoolsdir}/mongo-message-monitor/lib/" includes="testng*.jar"/>
+        </delete>
     </target>
 
     <target name="dist-package">
         <tar tarfile="${targetdir}/${distfilename}" longfile="gnu" compression="gzip">
 
             <tarfileset mode="754" dir="${targetdir}">
-                <include name="mongo-dist/bin/**"/>
+                <include name="${releasedir}/bin/**"/>
             </tarfileset>
 
             <tarfileset  dir="${targetdir}">
-                <include name="mongo-dist/**"/>
-                <exclude name="mongo-dist/bin/**"/>
+                <include name="${releasedir}/**"/>
+                <exclude name="${releasedir}/bin/**"/>
+            </tarfileset>
+
+            </tar>
+    </target>
+
+    <target name="dist-package-light">
+        <tar tarfile="${targetdir}/${distlightfilename}" longfile="gnu" compression="gzip">
+
+            <tarfileset mode="754" dir="${targetdir}">
+                <include name="${releasedir}/bin/**"/>
+            </tarfileset>
+
+            <tarfileset  dir="${targetdir}">
+                <include name="${releasedir}/**"/>
+                <exclude name="${releasedir}/bin/**"/>
             </tarfileset>
 
             </tar>
@@ -138,53 +185,71 @@
 
     <target name="upload-docs">
 
+        <!-- doc upload is a separate target so find the time-stamped dir name in target/  -->
+        <exec dir="${targetdir}" executable="ls" outputproperty="redirect-ls-doc"/>
+        <exec dir="${targetdir}" executable="grep" inputstring="${redirect-ls-doc}" outputproperty="redirect-grep">
+            <arg value="mongodb-"/>
+        </exec>
+
+        <exec dir="${targetdir}" executable="grep" inputstring="${redirect-grep}" outputproperty="doc-source-dir">
+            <arg value="-v"/>
+            <arg value="tgz"/>
+        </exec>
+
+        <echo message="Getting docs from : ${doc-source-dir}"/>
+
         <!-- we have to generate C docs since doxygen is flakey on linux atm -->
-        <antcall target="mongo-docs-dist"/>
+        <antcall target="mongo-docs-generate"/>
+
+        <copy todir="${targetdir}/${doc-source-dir}/docs">
+            <fileset dir="${workdir}/mongo/docs"/>
+        </copy>
 
         <!-- upload the C++ docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/docs/html"/>
+            <arg value="${targetdir}/${doc-source-dir}/docs/html"/>
             <arg value="c++"/>
         </exec>
 
         <!-- upload the python docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-python-driver/doc"/>
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-python-driver/doc"/>
             <arg value="python"/>
         </exec>
 
         <!-- upload the ruby docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-ruby-driver/html"/>
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-ruby-driver/html"/>
             <arg value="ruby"/>
         </exec>
 
         <!-- upload the java docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
-            <arg value="${targetdir}/mongo-dist/drivers_and_tools/supported/mongo-java-driver/docs"/>
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-java-driver/docs"/>
             <arg value="java"/>
         </exec>
 
     </target>
 
-    <target name="upload-dist" depends="gen-redirect-file" >
+    <target name="upload-dist" >
 
         <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
             <arg value="${targetdir}/${distfilename}"/>
             <arg value="${os}"/>
-            <arg value="${latestfilename}"/>
             <arg value="${distfilename}"/>
         </exec>
 
     </target>
 
-    <target name="gen-redirect-file">
-        <filter token="platform" value="${os}"/>
-        <filter token="distfilename" value="${distfilename}"/>
+    <target name="upload-dist-light" >
 
-        <copy filtering="true" file="${srcdir}/pages/latest_redirect_template.html" tofile="${targetdir}/${latestfilename}"/>
+        <exec failonerror="true" executable="${basedir}/upload_binary_s3.sh">
+            <arg value="${targetdir}/${distlightfilename}"/>
+            <arg value="${os}"/>
+            <arg value="${distlightfilename}"/>
+        </exec>
+
     </target>
-
 
     <!-- ======================================================
             mongo targets
@@ -196,13 +261,7 @@
         </exec>
     </target>
 
-    <target name="mongo-docs-dist" depends="mongo-docs">
-        <copy todir="${distdir}/docs">
-            <fileset dir="${workdir}/mongo/docs"/>
-        </copy>
-    </target>
-
-    <target name="mongo-docs">
+    <target name="mongo-docs-generate">
         <mkdir dir="${workdir}/mongo/docs"/>
         <exec dir="${workdir}/mongo" failonerror="true" executable="doxygen">
             <arg value="doxygenConfig"/>
@@ -221,8 +280,16 @@
     <target name="mongo-checkout">
         <exec dir="${workdir}" failonerror="true" executable="${basedir}/loop_git.sh">
           <arg value="clone"/>
+            <arg value="--depth"/>
+            <arg value="1"/>
           <arg value="git://github.com/mongodb/mongo.git"/>
         </exec>
+
+        <exec dir="${workdir}/mongo" failonerror="true" executable="git" >
+          <arg value="checkout"/>
+          <arg value="${mongodb-version}"/>
+        </exec>
+
     </target>
 
     <target name="mongo-update">
@@ -265,6 +332,11 @@
            <arg value="git://github.com/mongodb/mongo-ruby-driver.git"/>
          </exec>
 
+        <exec dir="${supportedtoolsdir}/mongo-ruby-driver" failonerror="true" executable="git" >
+          <arg value="checkout"/>
+          <arg value="${ruby-driver-version}"/>
+        </exec>
+
         <exec dir="${supportedtoolsdir}/mongo-ruby-driver" failonerror="true" executable="rake">
            <arg value="rdoc"/>
          </exec>
@@ -275,6 +347,11 @@
            <arg value="clone"/>
            <arg value="git://github.com/mongodb/mongo-python-driver.git"/>
          </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-python-driver" failonerror="true" executable="git" >
+          <arg value="checkout"/>
+          <arg value="${python-driver-version}"/>
+        </exec>
 
         <exec dir="${supportedtoolsdir}/mongo-python-driver" failonerror="true" executable="epydoc">
             <arg value="--config"/>
@@ -288,6 +365,11 @@
            <arg value="git://github.com/mongodb/mongo-java-driver.git"/>
          </exec>
 
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" failonerror="true" executable="git" >
+          <arg value="checkout"/>
+          <arg value="${java-driver-version}"/>
+        </exec>
+
         <exec dir="${supportedtoolsdir}/mongo-java-driver" failonerror="true" executable="ant">
            <arg value="jar"/>
         </exec>
@@ -298,7 +380,59 @@
 
         <!-- remove the build artifacts (.class files) and the testng jar -->
         <delete dir="${supportedtoolsdir}/mongo-java-driver/build"/>
-        <delete dir="${supportedtoolsdir}/mongo-java-driver/include"/>        
+        <delete dir="${supportedtoolsdir}/mongo-java-driver/lib"/>
     </target>
 
+
+    <target name="mongo-hash" unless="windows">
+
+        <exec dir="${workdir}/mongo" executable="git">
+            <arg value="log"/>
+            <redirector outputproperty="redirect1.git"/>
+        </exec>
+        <exec executable="awk">
+            <arg value='NR&lt;2 {print $2 " (mongo)"}'/>
+            <redirector inputstring="${redirect1.git}">
+                <outputmapper type="merge" to="${targetdir}/${releasedir}/mongo.hash"/>
+            </redirector>
+        </exec>
+
+    </target>
+
+    <target name="extra-hashes" unless="windows">
+
+        <exec dir="${supportedtoolsdir}/mongo-java-driver" executable="git">
+            <arg value="log"/>
+            <redirector outputproperty="redirect2.git"/>
+        </exec>
+        <exec executable="awk">
+            <arg value='NR&lt;2 {print $2 " (java driver)"}'/>
+            <redirector inputstring="${redirect2.git}">
+                <outputmapper type="merge" to="${targetdir}/${releasedir}/git.hashes"/>
+            </redirector>
+        </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-python-driver" executable="git">
+            <arg value="log"/>
+            <redirector outputproperty="redirect3.git"/>
+        </exec>
+        <exec executable="awk">
+            <arg value='NR&lt;2 {print $2 " (python driver)"}'/>
+            <redirector append="yes" inputstring="${redirect3.git}">
+                <outputmapper type="merge" to="${targetdir}/${releasedir}/git.hashes"/>
+            </redirector>
+        </exec>
+
+        <exec dir="${supportedtoolsdir}/mongo-ruby-driver" executable="git">
+            <arg value="log"/>
+            <redirector outputproperty="redirect4.git"/>
+        </exec>
+        <exec executable="awk">
+            <arg value='NR&lt;2 {print $2 " (ruby driver)"}'/>
+            <redirector append="yes" inputstring="${redirect4.git}">
+                <outputmapper type="merge" to="${targetdir}/${releasedir}/git.hashes"/>
+            </redirector>
+        </exec>
+
+    </target>
 </project>

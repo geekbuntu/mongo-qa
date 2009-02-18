@@ -10,4 +10,4 @@ They are divided into two sets :
 
 2) Unsupported - these are 3rd party projects that work with MongoDB and are
    included here for you convenience.  They are not supported by the MongoDB
-   project
+   project.  Theuy are found in the /community directory
