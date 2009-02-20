@@ -363,13 +363,7 @@ class GridFS:
         return result
 
     def remove_files(self):
-        connection = Connection()
-        db = connection["driver_test_framework"]
-        files = db["fs.files"]
-        chunks = db["fs.chunks"]
-        dict = {}
-        files.remove(dict);
-        chunks.remove(dict);
+        subprocess.call( ["java", "CleanGridfs"] )
 
 
 if len( sys.argv ) < 2:
