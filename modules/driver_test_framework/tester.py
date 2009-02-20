@@ -4,7 +4,7 @@ import sys
 import filecmp
 import subprocess
 from datetime import datetime
-#from pymongo.connection import Connection
+from src.python.pymongo.connection import Connection
 
 os.environ["CLASSPATH"] = "build:lib/mongo.jar"
 
@@ -263,6 +263,7 @@ class Framework (Summarizable):
         os.chdir(os.path.dirname(driver.get_path()))
         result[ "begin" ] = datetime.now()
         try:
+            print "\nAbout to run "+self.test_dir + driver.get_path()+" "+test+" "+ output+"]";
             result[ "exit_code" ] = subprocess.call( [self.test_dir + driver.get_path(), test, output] )
         except:
             result[ "exit_code" ] = -1
@@ -362,14 +363,13 @@ class GridFS:
         return result
 
     def remove_files(self):
-        """connection = Connection()
+        connection = Connection()
         db = connection["driver_test_framework"]
         files = db["fs.files"]
         chunks = db["fs.chunks"]
         dict = {}
         files.remove(dict);
-        chunks.remove(dict);"""
-        pass
+        chunks.remove(dict);
 
 
 if len( sys.argv ) < 2:
