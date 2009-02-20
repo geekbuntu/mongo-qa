@@ -124,6 +124,8 @@
         <antcall target="ruby-driver-dist"/>
         <antcall target="python-driver-dist"/>
         <antcall target="java-driver-dist"/>
+        <antcall target="php-driver-dist"/>
+
         <!-- <antcall target="mongo-docs-dist"/> -->
 
         <!-- community drivers and tools - be dumb for now -->
@@ -227,6 +229,15 @@
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
             <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-java-driver/docs"/>
             <arg value="java"/>
+        </exec>
+
+        <!-- generate the PHP docs in the target dir -->
+        <antcall target="php-driver-docs-generate"/>
+
+        <!-- upload the PHP docs -->
+        <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
+            <arg value="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-php-driver/docs"/>
+            <arg value="PHP"/>
         </exec>
 
     </target>
@@ -382,6 +393,28 @@
         <delete dir="${supportedtoolsdir}/mongo-java-driver/build"/>
         <delete dir="${supportedtoolsdir}/mongo-java-driver/lib"/>
     </target>
+
+
+    <target  name="php-driver-dist">
+        <exec dir="${supportedtoolsdir}" failonerror="true" executable="${basedir}/loop_git.sh">
+           <arg value="clone"/>
+           <arg value="git://github.com/mongodb/mongo-php-driver.git"/>
+         </exec>
+    </target>
+
+    <target  name="php-driver-docs-generate">
+
+        <mkdir dir="${supportedtoolsdir}/mongo-php-driver/docs"/>
+        
+        <exec dir="${supportedtoolsdir}/mongo-php-driver" failonerror="true" executable="/usr/share/pear/bin/phpdoc" >
+          <arg value="-d"/>
+          <arg value="/opt/mongo/php/mongo-php-driver/src/php"/>
+          <arg value="-t"/>
+          <arg value="docs"/>
+        </exec>
+    </target>
+
+
 
 
     <target name="mongo-hash" unless="windows">
