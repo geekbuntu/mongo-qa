@@ -4,7 +4,6 @@ import sys
 import filecmp
 import subprocess
 from datetime import datetime
-from src.python.pymongo.connection import Connection
 
 os.environ["CLASSPATH"] = "build:lib/mongo.jar"
 
