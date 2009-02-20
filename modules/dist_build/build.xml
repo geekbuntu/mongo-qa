@@ -233,16 +233,14 @@
 
         <!-- generate the PHP docs in the target dir -->
 
-            <mkdir dir="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-php-driver/docs"/>
+        <mkdir dir="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-php-driver/docs"/>
 
-            <exec dir="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-php-driver" failonerror="true" executable="/usr/share/pear/bin/phpdoc" >
-              <arg value="-d"/>
-              <arg value="/opt/mongo/php/mongo-php-driver/src/php"/>
-              <arg value="-t"/>
-              <arg value="docs"/>
-            </exec>
-        </target>
-
+        <exec dir="${targetdir}/${doc-source-dir}/drivers_and_tools/mongo-php-driver" failonerror="true" executable="/usr/share/pear/bin/phpdoc" >
+          <arg value="-d"/>
+          <arg value="/opt/mongo/php/mongo-php-driver/src/php"/>
+          <arg value="-t"/>
+          <arg value="docs"/>
+        </exec>
 
         <!-- upload the PHP docs -->
         <exec failonerror="true" executable="${basedir}/upload_docs_s3.sh">
