@@ -26,10 +26,14 @@ public class Indices {
         obj = new BasicDBObject();
         obj.put( "field1", 1 );
         c.ensureIndex( obj );
+        DBCursor cursor = c.find();
+        cursor.next();
 
         obj = new BasicDBObject();
         obj.put( "field2", 1 );
         c.ensureIndex( obj );
+        cursor = c.find();
+        cursor.next();
     }
 
     public static void validate() {
